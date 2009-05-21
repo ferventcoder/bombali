@@ -1,0 +1,70 @@
+<Include>
+     <!-- Step 1: Define the directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id='ProgramFilesFolder'>
+        <Directory Id="INSTALLDIR" Name="$(var.project.name)">
+        </Directory>
+      </Directory>
+    </Directory>
+
+    
+    <!-- Step 2: Add files to your installer package -->
+    <DirectoryRef Id="INSTALLDIR">
+        <Component Id="bombali.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\bombali.dll" KeyPath="no" />
+        </Component>
+        <Component Id="bombali.host.exe" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\bombali.host.exe" KeyPath="yes" Vital="yes" />
+        </Component>
+        <Component Id="bombali.host.exe.config" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\bombali.host.exe.config" KeyPath="no" Vital="yes" />
+        </Component>
+        <Component Id="Castle.Core.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\Castle.Core.dll" KeyPath="no" />
+        </Component>
+        <Component Id="Castle.DynamicProxy2.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\Castle.DynamicProxy2.dll" KeyPath="no" />
+        </Component>
+        <Component Id="Castle.MicroKernel.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\Castle.MicroKernel.dll" KeyPath="no" />
+        </Component>
+        <Component Id="Castle.Windsor.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\Castle.Windsor.dll" KeyPath="no" />
+        </Component>
+        <Component Id="log4net.dll" Guid="*">
+          <File Source="$(var.dirs.drop)\Bombali\log4net.dll" KeyPath="no" />
+        </Component>
+        <Directory Id="SETUPFILES" Name="setup">
+          <Component Id="InstallBombaliService.bat" Guid="*">
+            <File Source="$(var.dirs.drop)\Bombali\Setup\InstallBombaliService.bat" KeyPath="no" />
+           </Component>
+          <Component Id="UninstallBombaliService.bat" Guid="*">
+            <File Source="$(var.dirs.drop)\Bombali\Setup\UninstallBombaliService.bat" KeyPath="no" />
+          </Component>
+      </Directory>
+  </DirectoryRef>
+
+  <ComponentGroup Id="application_files">
+    <ComponentRef Id="bombali.dll" />
+    <ComponentRef Id="bombali.host.exe" />
+    <ComponentRef Id="bombali.host.exe.config" />
+    <ComponentRef Id="Castle.Core.dll" />
+    <ComponentRef Id="Castle.DynamicProxy2.dll" />
+    <ComponentRef Id="Castle.MicroKernel.dll" />
+    <ComponentRef Id="Castle.Windsor.dll" />
+    <ComponentRef Id="log4net.dll" />
+  </ComponentGroup>
+
+
+  <ComponentGroup Id="setup_files">
+    <ComponentRef Id="InstallBombaliService.bat" />
+    <ComponentRef Id="UninstallBombaliService.bat" />
+  </ComponentGroup>
+
+    <!-- Step 3: Tell WiX to install the files -->
+    <Feature Id="ProductFeature" Title="$(var.project.name) $(var.version)" Level="1">
+        <ComponentGroupRef Id="application_files" />
+        <ComponentGroupRef Id="setup_files" />
+    </Feature>
+ 
+</Include>

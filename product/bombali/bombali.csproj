@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{869B3D43-0606-499B-BDCF-2675F67986DD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>bombali</RootNamespace>
+    <AssemblyName>bombali</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\references\WindsorContainer\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy2, Version=2.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\references\WindsorContainer\Castle.DynamicProxy2.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\references\WindsorContainer\Castle.MicroKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\references\WindsorContainer\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\references\log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\SolutionVersion.cs">
+      <Link>SolutionVersion.cs</Link>
+    </Compile>
+    <Compile Include="domain\Monitor.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromServerConfigurationElementToIMonitor.cs" />
+    <Compile Include="infrastructure.app\monitorchecks\ICheck.cs" />
+    <Compile Include="infrastructure.app\monitorchecks\ServerCheck.cs" />
+    <Compile Include="infrastructure.app\monitorchecks\SqlDatabaseCheck.cs" />
+    <Compile Include="infrastructure.app\monitorchecks\WebsiteCheck.cs" />
+    <Compile Include="infrastructure.app\settings\ServerConfigurationElement.cs" />
+    <Compile Include="infrastructure.app\settings\ServerMonitorConfigurationCollection.cs" />
+    <Compile Include="infrastructure\notifications\Email.cs" />
+    <Compile Include="infrastructure\notifications\NotificationBuilder.cs" />
+    <Compile Include="infrastructure\notifications\INotification.cs" />
+    <Compile Include="infrastructure\notifications\SendNotification.cs" />
+    <Compile Include="domain\IDomainType.cs" />
+    <Compile Include="domain\IMonitor.cs" />
+    <Compile Include="orm\ServersConfigurationStore.cs" />
+    <Compile Include="runners\BombaliServiceRunner.cs" />
+    <Compile Include="orm\IPersistenceStore.cs" />
+    <Compile Include="infrastructure\timers\TimerElaspedEventHandler.cs" />
+    <Compile Include="orm\WebSitesConfigurationStore.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromEmailConfigurationToCSVString.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromWebsiteConfigurationElementToIMonitor.cs" />
+    <Compile Include="infrastructure.app\settings\WebsiteMonitorConfigurationCollection.cs" />
+    <Compile Include="infrastructure.app\settings\WebsiteConfigurationElement.cs" />
+    <Compile Include="infrastructure.app\settings\EmailConfigurationElement.cs" />
+    <Compile Include="infrastructure.app\settings\EmailConfigurationCollection.cs" />
+    <Compile Include="infrastructure.app\settings\BombaliConfiguration.cs" />
+    <Compile Include="infrastructure\commands\CommandList.cs" />
+    <Compile Include="infrastructure\commands\ICommand.cs" />
+    <Compile Include="infrastructure\commands\ICommandList.cs" />
+    <Compile Include="infrastructure\containers\Container.cs" />
+    <Compile Include="infrastructure\containers\custom\WindsorContainer.cs" />
+    <Compile Include="infrastructure\containers\IContainer.cs" />
+    <Compile Include="infrastructure\extensions\Iteration.cs" />
+    <Compile Include="infrastructure\extensions\StringExtensions.cs" />
+    <Compile Include="infrastructure\extensions\TypeCasting.cs" />
+    <Compile Include="infrastructure\extensions\TypeExtensions.cs" />
+    <Compile Include="infrastructure\logging\custom\Log4NetLogFactory.cs" />
+    <Compile Include="infrastructure\logging\custom\Log4NetLogger.cs" />
+    <Compile Include="infrastructure\logging\ILog.cs" />
+    <Compile Include="infrastructure\logging\ILogFactory.cs" />
+    <Compile Include="infrastructure\logging\Log.cs" />
+    <Compile Include="infrastructure\ApplicationParameters.cs" />
+    <Compile Include="infrastructure\mapping\IMapper.cs" />
+    <Compile Include="infrastructure\mapping\Map.cs" />
+    <Compile Include="infrastructure\mapping\MapBuilder.cs" />
+    <Compile Include="infrastructure\timers\DefaultTimer.cs" />
+    <Compile Include="infrastructure\timers\ITimer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="runners\IRunner.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

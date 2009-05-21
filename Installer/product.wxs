@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?ifndef version ?>
+    <?define version.app="1.0.0.0"?>
+  <?elseif version="0.0.0.0" ?>
+    <?define version.app="1.0.0.0"?>
+  <?else?>
+    <?define version.app="$(var.version)" ?>
+  <?endif?>
+
+  <Product Id="*" 
+      Name="$(var.project.name)" 
+      Manufacturer="$(var.company.name)" 
+      Language="1033" 
+      Version="$(var.version.app)"
+      UpgradeCode="$(var.product.upgrade.guid)"
+      >
+    
+    <Package InstallerVersion="300" Compressed="yes" Manufacturer="$(var.company.name)" />
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" /> 
+    
+    <Property Id="ALLUSERS">1</Property>
+    
+    <?ifdef file.license ?>
+      <WixVariable Id="WixUILicenseRtf" Value="$(var.file.license)" />
+    <?endif?>
+    
+    <?include upgrade.wxs ?>
+
+    <?include files.wxs ?>
+    
+    <?include customtasks.wxs ?>
+    
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+    <!-- Step 4: UI for your installer -->
+    <UI>
+      <!--<UIRef Id="WixUI_Minimal" />-->
+      <!--<UIRef Id="WixUI_FeatureTree"/>-->
+      <UIRef Id="WixUI_InstallDir" />
+      <!--<UIRef Id="WixUI_Mondo" />-->
+      <UIRef Id="WixUI_ErrorProgressText" />
+    </UI>
+    
+  </Product>
+</Wix>
