@@ -1,0 +1,33 @@
+<Include>
+    <?define RTMProductVersion="0.0.0.0" ?>
+  
+    <Upgrade Id="$(var.product.upgrade.guid)">      
+      <UpgradeVersion 
+        Minimum="$(var.version.app)"
+        IncludeMinimum="no"
+        OnlyDetect="yes"
+        Language="1033"
+        Property="NEWPRODUCTFOUND" 
+        />
+ <!--     <UpgradeVersion 
+          Minimum="$(var.RTMProductVersion)"
+          IncludeMinimum="yes"
+          Maximum="$(var.version.app)"
+          IncludeMaximum="no"
+          Language="1033"
+          Property="UPGRADEFOUND" 
+          />-->
+    </Upgrade>
+
+    <!-- Prevent downgrading -->    
+    <CustomAction Id="PreventDowngrading" Error="Newer version already installed." />     
+    <!-- Sequences -->    
+    <InstallExecuteSequence>      
+      <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>      
+      <RemoveExistingProducts After="InstallFinalize" />    
+    </InstallExecuteSequence>     
+    <InstallUISequence>      
+      <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>    
+    </InstallUISequence>     
+
+</Include>

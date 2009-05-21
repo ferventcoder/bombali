@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="Packager" default="go">
+  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="dirs.build" value="${dirs.current}\..\build_output" />
+  <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
+  <property name="app.drop.folder" value="app" overwrite="false" />
+
+  <target name="go" depends="add_setup_files" description="Packaging" />
+
+  <target name="add_setup_files">
+    <echo message="Packaging setup files to ${dirs.drop}\app\Setup."/>
+    <copy todir="${dirs.drop}\${app.drop.folder}\Setup">
+      <fileset basedir="${dirs.build}\..\Setup">
+        <include name="**/*.*" />
+      </fileset>
+    </copy>
+  </target>
+
+
+
+</project>

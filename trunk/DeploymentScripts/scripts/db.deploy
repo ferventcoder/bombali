@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: CCNetLabel;branch.build.number;usdDatabaseVersion;svn.username;svn.password-->
+<project name="Tarantino" default="manage_sql_database">
+	<include buildfile="${file.settings}" />
+
+  <!-- Database change management -->
+  <property name="database.integrated" value="true" overwrite="false" />
+
+  <target name="manage_sql_database">
+    <manageSqlDatabase
+      scriptDirectory="${dirs.db}"
+      action="${database.action}"
+      server="${database.server}"
+      integratedAuthentication="${database.integrated}"
+      database="${database.name}"
+      />
+  </target>
+
+</project>
