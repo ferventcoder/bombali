@@ -75,6 +75,10 @@
     <Compile Include="infrastructure.app\monitorchecks\ServerCheck.cs" />
     <Compile Include="infrastructure.app\monitorchecks\SqlDatabaseCheck.cs" />
     <Compile Include="infrastructure.app\monitorchecks\WebsiteCheck.cs" />
+    <Compile Include="infrastructure.app\publishers\DatabasePublisher.cs" />
+    <Compile Include="infrastructure.app\publishers\EmailSmtpPublisher.cs" />
+    <Compile Include="infrastructure.app\publishers\IPublisher.cs" />
+    <Compile Include="infrastructure.app\publishers\MassTransitPublisher.cs" />
     <Compile Include="infrastructure.app\settings\ServerConfigurationElement.cs" />
     <Compile Include="infrastructure.app\settings\ServerMonitorConfigurationCollection.cs" />
     <Compile Include="infrastructure\notifications\Email.cs" />
