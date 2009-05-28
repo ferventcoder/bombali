@@ -5,18 +5,16 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="app.ndepend" value="C:\Program Files\NDepend\NDepend.Console.exe" overwrite="false" />
-  <property name="dirs.build" value="${directory::get-parent-directory(project::get-buildfile-path())}\..\..\build_output" />
-  <property name="version.revision" value="0" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="file.custom.ndepend.build" value="${dirs.current}\..\..\BuildScripts.Custom\Analyzers\_ndepend.build" overwrite="false" />
+  <property name="dirs.build" value="${dirs.current}\..\..\build_output" />
   <property name="dirs.build_artifacts" value="${path::get-full-path(dirs.build)}\build_artifacts" />
+  <property name="version.revision" value="0" overwrite="false" />
+  <property name="file.custom.ndepend.build" value="${dirs.current}\..\..\BuildScripts.Custom\Analyzers\_ndepend.build" overwrite="false" />
   <property name="dirs.ndepend_results" value="${dirs.build_artifacts}\ndepend" />
-  <property name="dirs.ndepend_images" value="${dirs.ndepend_results}\images" />
-  <property name="files.build_info" value="${dirs.ndepend_results}\_buildinfo.xml" />
   <property name="files.ndepend_config" value="${path::get-full-path(dirs.current)}\..\..\NDepend.xml" />
 
   <target name="go"
-          depends="cleanup, create_build_info_file, ndepend, copy_images, custom_tasks"
+          depends="cleanup, ndepend, custom_tasks"
           description="Using NDepend to Analyze project for quality indicators."
           if="${file::exists(app.ndepend)}"
           />
@@ -27,13 +25,6 @@
     <mkdir dir="${dirs.ndepend_results}" />
   </target>
 
-  <target name="create_build_info_file">
-    <echo message="Generating XML file with some information to get merged in at ${files.build_info}."/>
-    <echo file="${files.build_info}" append="false" failonerror="false">
-      <![CDATA[<revision>${version.revision}</revision>]]>
-    </echo>
-  </target>
-
   <target name="ndepend" depends="cleanup" if="${file::exists(app.ndepend)}">
     <echo message="Attempting to run NDepend at ${app.ndepend} for file ${files.ndepend_config}." />
 
@@ -41,13 +32,6 @@
       <arg line="${files.ndepend_config} /OutDir ${dirs.ndepend_results} /InDirs ${path::get-full-path(dirs.build)} C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727 C:\WINDOWS\Microsoft.NET\Framework\v3.0 C:\WINDOWS\Microsoft.NET\Framework\v3.5" />
       <!--  /EmitVisualNDependBinXml -->
     </exec>
-  </target>
-
-  <target name="copy_images" depends="ndepend" if="${file::exists(app.ndepend)}">
-    <echo message="Copying image files with unique names to ${dirs.ndepend_images}."/>
-    <copy file="${dirs.ndepend_results}\AbstractnessVSInstability.png" tofile="${dirs.ndepend_images}\AbstractnessVSInstability_r${version.revision}.png" failonerror="false" />
-    <copy file="${dirs.ndepend_results}\VisualNDependView.png" tofile="${dirs.ndepend_images}\VisualNDependView_r${version.revision}.png" failonerror="false" />
-    <copy file="${dirs.ndepend_results}\ComponentDependenciesDiagram.png" tofile="${dirs.ndepend_images}\ComponentDependenciesDiagram_r${version.revision}.png" failonerror="false" />
   </target>
 
   <target name="custom_tasks">

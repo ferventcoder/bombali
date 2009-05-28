@@ -27,6 +27,7 @@
     <property name="dirs.drop" value="${environment::get-variable('CCNetArtifactDirectory')}\b${version.build}-r${version.revision}" if="${environment::variable-exists('CCNetArtifactDirectory')}" />
 
     <nant buildfile="${dirs.current}\_generate_assembly.build" inheritall="true" />
+    <nant buildfile="${dirs.current}\_generate_buildinfo.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_compile.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_analyze.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_configurations.build" inheritall="true" />

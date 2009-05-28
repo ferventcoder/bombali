@@ -22,6 +22,9 @@
   <property name="file.ncover_log" value="${dirs.ncover_results}\${project.name}.ncover.log" />
   <property name="file.xml.code_coverage_results" value="${project.name}.CodeCoverageSummary-results.xml" />
   <property name="file.html.code_coverage_results" value="${project.name}.CodeCoverageSummary-results.html" />
+  <property name="tests.excluded_categories.comma_separated" value="Database,Integration,Slow,NotWorking" overwrite="false" />
+  <property name="test.args" value="/rt:Text /rnf:mbUnit /rf:${dirs.ncover_results} /ec:${tests.excluded_categories.comma_separated}" if="${test.framework=='mbunit'}" />
+  <property name="test.args" value="/xml:${dirs.ncover_results}\nunit-results.xml /nologo /exclude:${tests.excluded_categories.comma_separated}" if="${test.framework=='nunit'}" />
 
   <target name="go" depends="cleanup, get_test_dlls, ncover, ncover_explorer" description="Using NCover to Analyze project for test quality indicators." if="${file::exists(app.ncover)}" />
 
@@ -51,8 +54,7 @@
     <property name="dlls.test" value="${dll.names}" />
     <echo message="Running NCover against these test dlls - ${dlls.test}." />
 
-    <property name="args.test_runner" value="${dlls.test} /rt:Text /rnf:mbUnit /rf:${dirs.ncover_results}" if="${test.framework=='mbunit'}" />
-    <property name="args.test_runner" value="${dlls.test} /xml:${dirs.ncover_results}\nunit-results.xml /nologo" if="${test.framework=='nunit'}" />
+    <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
 
   <target name="ncover" if="${file::exists(app.ncover)}" >
