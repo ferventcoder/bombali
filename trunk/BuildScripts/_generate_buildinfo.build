@@ -5,7 +5,7 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="dirs.build" value="${dirs.current}\..\..\build_output" />
+  <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="dirs.build_artifacts" value="${path::get-full-path(dirs.build)}\build_artifacts" />
   <property name="version.revision" value="0" overwrite="false" />
    <property name="files.build_info" value="${dirs.build_artifacts}\_buildinfo.xml" />
