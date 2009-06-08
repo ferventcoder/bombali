@@ -13,7 +13,7 @@
   <target name="go" depends="error_check, update_assemblies" description="Moving assemblies to make available for Externals." />
 
   <target name="error_check">
-    <fail message="You must provide arguments to the command line like this _update_assemblies.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION'"
+    <fail message="You must provide arguments to the command line like this _update_assemblies.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file _update_assemblies.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
   </target>
 

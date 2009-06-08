@@ -18,7 +18,7 @@
   <target name="go" depends="error_check, cleanup, build_code, custom_tasks" description="Compiling project." />
 
   <target name="error_check">
-    <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' OR _compile.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION'"
+    <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' OR _compile.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
   </target>
 

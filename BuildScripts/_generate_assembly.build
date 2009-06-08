@@ -20,7 +20,7 @@
   <target name="go" depends="error_check, determine_language, generate_assembly_info" description="Generating Assembly File" />
 
   <target name="error_check">
-    <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' -D:company.name='Company name'"
+    <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' -D:company.name='Company name' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__' or company.name=='__COMPANY_NAME__'}" />
   </target>
 
