@@ -35,8 +35,7 @@
   
   <target name="get_build_number">
     <property name="version.build" value="${environment::get-variable('CCNetNumericLabel')}" if="${environment::variable-exists('CCNetNumericLabel')}" />
-    <property name="version.build" value="${build.number}" if="${property::exists('build.number')}" />
-    <echo message="Team city number is ${build.number}." />
+    <property name="version.build" value="${environment::get-variable('BUILD_NUMBER')}" if="${environment::variable-exists('BUILD_NUMBER')}" />
     <echo message="Using build number ${version.build}." />
   </target>
 
