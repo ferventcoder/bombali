@@ -11,7 +11,7 @@
   <target name="go" depends="error_check, cleanup, zip" description="Zipping assemblies." />
 
   <target name="error_check">
-    <fail message="You must provide arguments to the command line like this _zip.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION'"
+    <fail message="You must provide arguments to the command line like this _zip.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file _zip.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
   </target>
 

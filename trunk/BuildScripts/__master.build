@@ -16,15 +16,14 @@
   <target name="go" depends="error_check, build, custom_tasks" description="Building" />
 
   <target name="error_check">
-    <fail message="You must provide arguments in your command line call like this: __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY'"
+    <fail message="You must provide arguments in your command line call like this: __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${repository.path=='__REPOSITORY_PATH__'}" />
   </target>
 
   <target name="build">
     <call target="get_revision" />
-
-    <property name="version.build" value="${environment::get-variable('CCNetNumericLabel')}" if="${environment::variable-exists('CCNetNumericLabel')}" />
-    <property name="dirs.drop" value="${environment::get-variable('CCNetArtifactDirectory')}\b${version.build}-r${version.revision}" if="${environment::variable-exists('CCNetArtifactDirectory')}" />
+    <call target="get_build_number" />
+    <call target="get_drop_directory" />
 
     <nant buildfile="${dirs.current}\_generate_assembly.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_compile.build" inheritall="true" />
@@ -32,6 +31,18 @@
     <nant buildfile="${dirs.current}\_generate_buildinfo.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_configurations.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_package.build" inheritall="true" />
+  </target>
+  
+  <target name="get_build_number">
+    <property name="version.build" value="${environment::get-variable('CCNetNumericLabel')}" if="${environment::variable-exists('CCNetNumericLabel')}" />
+    <property name="version.build" value="${environment::get-variable('build.number')}" if="${environment::variable-exists('build.number')}" />
+    <echo message="Using build number ${version.build}." />
+  </target>
+
+  <target name="get_drop_directory">
+    <property name="dirs.drop" value="${environment::get-variable('CCNetArtifactDirectory')}\b${version.build}-r${version.revision}" if="${environment::variable-exists('CCNetArtifactDirectory')}" />
+    <!--Point TeamCity at code_drop for an artifact directory. It will automatically save the files. - teamcity.build.workingDir-->
+    <echo message="Compiled code drop directory will be ${path::get-full-path(dirs.drop)}." />
   </target>
 
   <target name="custom_tasks">
@@ -62,7 +73,7 @@
       failonerror="false"/>
     <delete file="_revision.xml" failonerror="false" />
 
-    <echo message="INFO: Using Subversion revision number: ${version.revision}"/>
+    <echo message="Using Subversion revision number: ${version.revision}"/>
   </target>
 
   <target name="git_get_revision" description="Gets the current revision number"></target>
