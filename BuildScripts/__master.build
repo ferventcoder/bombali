@@ -41,7 +41,7 @@
 
   <target name="get_drop_directory">
     <property name="dirs.drop" value="${environment::get-variable('CCNetArtifactDirectory')}\b${version.build}-r${version.revision}" if="${environment::variable-exists('CCNetArtifactDirectory')}" />
-    <!--Point TeamCity at code_drop for an artifact directory. It will automatically save the files. - teamcity.build.workingDir-->
+    <!--Point TeamCity at code_drop for an artifact directory. It will automatically save the files. -->
     <echo message="Compiled code drop directory will be ${path::get-full-path(dirs.drop)}." />
   </target>
 
