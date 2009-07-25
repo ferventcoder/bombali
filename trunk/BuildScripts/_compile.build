@@ -8,20 +8,32 @@
   <property name="path_to_solution" value="." overwrite="false" />
   <property name="microsoft.framework" value="net-3.5" overwrite="false" />
   <property name="msbuild.configuration" value="Release" overwrite="false" />
-  <property name="platform" value="Any CPU" overwrite="false" />
+  <property name="msbuild.platform" value="Any CPU" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="file.custom.compile.build" value="${dirs.current}\..\BuildScripts.Custom\_compile.build" overwrite="false" />
+  <property name="file.custom.compile.build.before" value="${dirs.current}\..\BuildScripts.Custom\_compile.pre.build" overwrite="false" />
+  <property name="file.custom.compile.build.after" value="${dirs.current}\..\BuildScripts.Custom\_compile.post.build" overwrite="false" />
+  <property name="file.custom.compile.build.after.legacy" value="${dirs.current}\..\BuildScripts.Custom\_compile.build" overwrite="false" />
+  <property name="file.custom.compile.build.replace" value="${dirs.current}\..\BuildScripts.Custom\_compile.replace.build" overwrite="false" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="solution.path" value="${dirs.current}\..\${path_to_solution}\${project.name}.sln" />
   <property name="nant.settings.currentframework" value="${microsoft.framework}" />
+   <property name="dirs.documentation" value="docs" overwrite="false" />
+  <property name="dirs.docs" value="${dirs.current}\..\${dirs.documentation}" />
+  <property name="dirs.db.project" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
+  <property name="dirs.db" value="${dirs.current}\..\${dirs.db.project}" />
 
-  <target name="go" depends="error_check, cleanup, build_code, custom_tasks" description="Compiling project." />
+  <target name="go" depends="error_check, custom_tasks_before, cleanup, build_code, copy_documentation, copy_db, custom_tasks_after" description="Compiling project." />
 
   <target name="error_check">
     <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' OR _compile.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
   </target>
 
+  <target name="custom_tasks_before">
+    <echo message="Running custom compiler tasks if ${file.custom.compile.build.before} exists." />
+    <nant buildfile="${file.custom.compile.build.before}" inheritall="true" if="${file::exists(file.custom.compile.build.before)}" failonerror="false" />
+  </target>
+  
   <target name="cleanup">
     <echo message="Removing and adding ${dirs.build}."/>
     <delete dir="${dirs.build}" failonerror="false" />
@@ -33,13 +45,32 @@
     <msbuild project="${solution.path}" verbosity="quiet">
       <property name="Configuration" value="${msbuild.configuration}" />
       <property name="OutputPath" value="${dirs.build}" />
-      <property name="Platform" value="${platform}" />
+      <property name="Platform" value="${msbuild.platform}" />
     </msbuild>
   </target>
+  
+  <target name="copy_documentation">
+    <echo message="Building documentation files to ${dirs.build}\${dirs.documentation}."/>
+    <copy todir="${dirs.build}\${dirs.documentation}">
+      <fileset basedir="${dirs.docs}">
+        <include name="**/*.*" />
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="copy_db">
+    <echo message="Building database files to ${dirs.build}\${dirs.db.project}."/>
+    <copy todir="${dirs.build}\${dirs.db.project}">
+      <fileset basedir="${dirs.db}">
+        <include name="**/*.*" />
+      </fileset>
+    </copy>
+  </target>
 
-  <target name="custom_tasks">
-    <echo message="Running custom compiler tasks if ${file.custom.compile.build} exists." />
-    <nant buildfile="${file.custom.compile.build}" inheritall="true" if="${file::exists(file.custom.compile.build)}" failonerror="false" />
+  <target name="custom_tasks_after">
+    <echo message="Running custom compiler tasks if ${file.custom.compile.build.after} or ${file.custom.compile.build.after.legacy} exists." />
+    <nant buildfile="${file.custom.compile.build.after}" inheritall="true" if="${file::exists(file.custom.compile.build.after)}" failonerror="false" />
+    <nant buildfile="${file.custom.compile.build.after.legacy}" inheritall="true" if="${file::exists(file.custom.compile.build.after.legacy)}" failonerror="false" />
   </target>
 
 </project>

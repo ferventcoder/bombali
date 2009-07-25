@@ -8,15 +8,17 @@
   <property name="dirs.report.project" value="__REPORT_PROJECT_FOLDER__" overwrite="false" />
   <property name="dirs.documentation" value="docs" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="file.custom.package.build" value="${dirs.current}\..\BuildScripts.Custom\_package.build" overwrite="false" />
+  <property name="file.custom.package.build.before" value="${dirs.current}\..\BuildScripts.Custom\_package.pre.build" overwrite="false" />
+  <property name="file.custom.package.build.after" value="${dirs.current}\..\BuildScripts.Custom\_package.post.build" overwrite="false" />
+  <property name="file.custom.package.build.after.legacy" value="${dirs.current}\..\BuildScripts.Custom\_package.build" overwrite="false" />
+  <property name="file.custom.package.build.replace" value="${dirs.current}\..\BuildScripts.Custom\_package.replace.build" overwrite="false" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
   <property name="app.drop.folder" value="app" overwrite="false" />
-  <property name="dirs.db" value="${dirs.current}\..\${dirs.db.project}" />
   <property name="dirs.report" value="${dirs.current}\..\${dirs.report.project}" />
-  <property name="dirs.docs" value="${dirs.current}\..\${dirs.documentation}" />
 
-  <target name="go" depends="cleanup, build_artifacts, app, db, reports, file_server, configuration_files, deployment_scripts, settings_files, build_deployment_files, documentation, custom_tasks" description="Packaging" />
+
+  <target name="go" depends="cleanup, custom_tasks_before, build_artifacts, app, db, reports, file_server, environment_files, deployment_scripts, settings_files, build_deployment_files, documentation, custom_tasks_after" description="Packaging" />
 
   <target name="cleanup">
     <echo message="Removing and adding ${dirs.drop}."/>
@@ -24,6 +26,11 @@
     <mkdir dir="${dirs.drop}" />
   </target>
 
+  <target name="custom_tasks_before">
+    <echo message="Running custom packaging tasks if ${file.custom.package.build.before} exists." />
+    <nant buildfile="${file.custom.package.build.before}" inheritall="true" if="${file::exists(file.custom.package.build.before)}" failonerror="false" />
+  </target>
+  
   <target name="build_artifacts">
     <echo message="Packaging build artifacts (such as test results) to ${dirs.drop}\build_artifacts."/>
     <copy todir="${dirs.drop}\build_artifacts">
@@ -38,9 +45,11 @@
     <copy todir="${dirs.drop}\${app.drop.folder}">
       <fileset basedir="${dirs.build}">
         <exclude name="*Test*\**" />
+        <exclude name="${dirs.db.project}\**" />
+        <exclude name="${dirs.documentation}\**" />
         <exclude name="*.Specs*\**" />
         <exclude name="*_Published*\**" />
-        <exclude name="Configurations\**" />
+        <exclude name="EnvironmentFiles\**" />
         <exclude name="*build_artifacts*\**" />
         <exclude name="*bdddoc.*" />
         <exclude name="*developwithpassion.bdd.*" />
@@ -49,7 +58,7 @@
         <exclude name="*MbUnit*.*" />
         <exclude name="*Rhino.Mocks.*" />
         <exclude name="*Refly.*" />
-        <exclude name="*.template" />
+        <exclude name="**\*.template" />
         <include name="**/*.*" />
       </fileset>
     </copy>
@@ -65,7 +74,7 @@
   <target name="db">
     <echo message="Packaging database files to ${dirs.drop}\${dirs.db.project}."/>
     <copy todir="${dirs.drop}\${dirs.db.project}">
-      <fileset basedir="${dirs.db}">
+      <fileset basedir="${dirs.build}\${dirs.db.project}">
         <include name="**/*.*" />
       </fileset>
     </copy>
@@ -89,10 +98,10 @@
     </copy>
   </target>
 
-  <target name="configuration_files">
-    <echo message="Packaging configuration files to ${dirs.drop}\Configurations."/>
-    <copy todir="${dirs.drop}\Configurations">
-      <fileset basedir="${dirs.build}\Configurations">
+  <target name="environment_files">
+    <echo message="Packaging environment files to ${dirs.drop}\EnvironmentFiles."/>
+    <copy todir="${dirs.drop}\EnvironmentFiles">
+      <fileset basedir="${dirs.build}\EnvironmentFiles">
         <include name="**/*.*" />
       </fileset>
     </copy>
@@ -124,15 +133,16 @@
   <target name="documentation">
     <echo message="Packaging documentation files to ${dirs.drop}\${dirs.documentation}."/>
     <copy todir="${dirs.drop}\${dirs.documentation}">
-      <fileset basedir="${dirs.docs}">
+      <fileset basedir="${dirs.build}\${dirs.documentation}">
         <include name="**/*.*" />
       </fileset>
     </copy>
   </target>
 
-  <target name="custom_tasks">
-    <echo message="Running custom packaging tasks if ${file.custom.package.build} exists." />
-    <nant buildfile="${file.custom.package.build}" inheritall="true" if="${file::exists(file.custom.package.build)}" failonerror="false" />
+  <target name="custom_tasks_after">
+    <echo message="Running custom packaging tasks if ${file.custom.package.build.after} or ${file.custom.package.build.after.legacy} exists." />
+    <nant buildfile="${file.custom.package.build.after}" inheritall="true" if="${file::exists(file.custom.package.build.after)}" failonerror="false" />
+    <nant buildfile="${file.custom.package.build.after.legacy}" inheritall="true" if="${file::exists(file.custom.package.build.after.legacy)}" failonerror="false" />
   </target>
 
 </project>
