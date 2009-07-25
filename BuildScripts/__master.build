@@ -7,17 +7,25 @@
   <property name="repository.path" value="__REPOSITORY_PATH__" overwrite="false" />
   <property name="source_control_type" value="svn" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="file.custom.master.build" value="${dirs.current}\..\BuildScripts.Custom\__master.build" overwrite="false" />
+  <property name="file.custom.master.build.before" value="${dirs.current}\..\BuildScripts.Custom\__master.pre.build" overwrite="false" />
+  <property name="file.custom.master.build.after.legacy" value="${dirs.current}\..\BuildScripts.Custom\__master.build" overwrite="false" />
+  <property name="file.custom.master.build.after" value="${dirs.current}\..\BuildScripts.Custom\__master.post.build" overwrite="false" />
+  <property name="file.custom.master.build.replace" value="${dirs.current}\..\BuildScripts.Custom\__master.replace.build" overwrite="false" />
   <property name="version.revision" value="0" />
   <property name="version.build" value="0" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
 
-  <target name="go" depends="error_check, build, custom_tasks" description="Building" />
+  <target name="go" depends="error_check, custom_tasks_before, build, custom_tasks_after" description="Building" />
 
   <target name="error_check">
     <fail message="You must provide arguments in your command line call like this: __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${repository.path=='__REPOSITORY_PATH__'}" />
+  </target>
+
+  <target name="custom_tasks_before">
+    <echo message="Running custom master tasks if ${file.custom.master.build.before} exists." />
+    <nant buildfile="${file.custom.master.build.before}" inheritall="true" if="${file::exists(file.custom.master.build.before)}" failonerror="false" />
   </target>
 
   <target name="build">
@@ -25,11 +33,12 @@
     <call target="get_build_number" />
     <call target="get_drop_directory" />
 
+    <nant buildfile="${dirs.current}\_policies.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_generate_assembly.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_compile.build" inheritall="true" />
+    <nant buildfile="${dirs.current}\_environments.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_analyze.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_generate_buildinfo.build" inheritall="true" />
-    <nant buildfile="${dirs.current}\_configurations.build" inheritall="true" />
     <nant buildfile="${dirs.current}\_package.build" inheritall="true" />
   </target>
   
@@ -45,9 +54,10 @@
     <echo message="Compiled code drop directory will be ${path::get-full-path(dirs.drop)}." />
   </target>
 
-  <target name="custom_tasks">
-    <echo message="Running custom master tasks if ${file.custom.master.build} exists." />
-    <nant buildfile="${file.custom.master.build}" inheritall="true" if="${file::exists(file.custom.master.build)}" failonerror="false" />
+  <target name="custom_tasks_after">
+    <echo message="Running custom master tasks if ${file.custom.master.build.after} or ${file.custom.master.build.after.legacy} exists." />
+    <nant buildfile="${file.custom.master.build.after}" inheritall="true" if="${file::exists(file.custom.master.build.after)}" failonerror="false" />
+    <nant buildfile="${file.custom.master.build.after.legacy}" inheritall="true" if="${file::exists(file.custom.master.build.after.legacy)}" failonerror="false" />
   </target>
 
   <target name="get_revision">
