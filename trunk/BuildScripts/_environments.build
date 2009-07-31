@@ -9,15 +9,15 @@
   <property name="dirs.build.environmentfiles" value="${dirs.build}\EnvironmentFiles" overwrite="false" />
   <property name="dirs.environments.settings" value="${dirs.current}\..\Settings" overwrite="false" />
   <property name="dirs.environments.templates" value="${dirs.build}" overwrite="false" />
-  <property name="settings.environment" value="" readonly="false" />
 
-  <target name="go" depends="find_settings_files,build_environment_files" description="Build Environment Files" if="${directory::exists(dirs.environments.settings)}" />
+  <target name="go" depends="build_environments" description="Build Environment Files" if="${directory::exists(dirs.environments.settings)}" />
 
-  <target name="find_settings_files" if="${directory::exists(dirs.environments.settings)}">
-    <foreach item="File" in="${dirs.environments.settings}" property="settings.filename" if="${directory::exists(dirs.environments.settings)}">
-      <if test="${string::ends-with(settings.filename, '.settings')}">
-        <echo message="I found environment ${path::get-file-name-without-extension(settings.filename)} with settings file ${path::get-file-name(settings.filename)}"/>
-      </if>
+  <target name="build_environments">
+    <call target="build_environment_files" />
+  
+    <foreach item="Folder" in="${dirs.environments.templates}" property="templates.folder">
+        <property name ="dirs.environments.templates" value="${templates.folder}" />
+        <call target="build_environment_files" />
     </foreach>
   </target>
 
@@ -30,13 +30,15 @@
 
   <target name="build_environment_files" if="${directory::exists(dirs.environments.settings)}">
     <echo message="Looking for template files in ${dirs.environments.templates}." />
-    <foreach item="File" in="${dirs.environments.templates}" property="templates.filename" if="${directory::exists(dirs.environments.templates)}">
-      <if test="${string::ends-with(templates.filename, '.template')}">
-        <foreach item="File" in="${dirs.environments.settings}" property="settings.filename" if="${directory::exists(dirs.environments.settings)}">
-          <if test="${string::ends-with(settings.filename, '.settings')}">
-            <include buildfile="${settings.filename}" failonerror="false"  />
-            <property name="settings.environment" value="${path::get-file-name-without-extension(settings.filename)}"/>
-      
+    <foreach item="File" in="${dirs.environments.settings}" property="settings.filename" if="${directory::exists(dirs.environments.settings)}">
+      <if test="${string::ends-with(settings.filename, '.settings')}">
+        <echo message="I found environment ${path::get-file-name-without-extension(settings.filename)} with settings file ${path::get-file-name(settings.filename)}"/>
+        
+        <include buildfile="${settings.filename}" />
+        <property name="settings.environment" value="${path::get-file-name-without-extension(settings.filename)}"/>
+        
+        <foreach item="File" in="${dirs.environments.templates}" property="templates.filename" if="${directory::exists(dirs.environments.templates)}">
+          <if test="${string::ends-with(templates.filename, '.template')}">
             <echo message="Taking template file ${path::get-file-name(templates.filename)} and creating destination file ${settings.environment}.${path::get-file-name-without-extension(templates.filename)}"/>
             <copy
                 file="${templates.filename}"
@@ -50,11 +52,6 @@
           </if>
         </foreach>
       </if>
-    </foreach>
-    
-    <foreach item="Folder" in="${dirs.environments.templates}" property="templates.folder">
-        <property name ="dirs.environments.templates" value="${templates.folder}" />
-        <call target="build_environment_files" />
     </foreach>
   </target>
 
