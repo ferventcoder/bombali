@@ -70,6 +70,7 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="domain\Monitor.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromMonitorConfigurationElementToIMonitor.cs" />
     <Compile Include="infrastructure.app\mapping\MapFromServerConfigurationElementToIMonitor.cs" />
     <Compile Include="infrastructure.app\monitorchecks\ICheck.cs" />
     <Compile Include="infrastructure.app\monitorchecks\ServerCheck.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="infrastructure.app\publishers\EmailSmtpPublisher.cs" />
     <Compile Include="infrastructure.app\publishers\IPublisher.cs" />
     <Compile Include="infrastructure.app\publishers\MassTransitPublisher.cs" />
+    <Compile Include="infrastructure.app\settings\MonitorConfigurationElement.cs" />
+    <Compile Include="infrastructure.app\settings\MonitorConfigurationCollection.cs" />
     <Compile Include="infrastructure.app\settings\ServerConfigurationElement.cs" />
     <Compile Include="infrastructure.app\settings\ServerMonitorConfigurationCollection.cs" />
     <Compile Include="infrastructure\notifications\Email.cs" />
@@ -87,6 +90,7 @@
     <Compile Include="infrastructure\notifications\SendNotification.cs" />
     <Compile Include="domain\IDomainType.cs" />
     <Compile Include="domain\IMonitor.cs" />
+    <Compile Include="orm\MonitorConfigurationStore.cs" />
     <Compile Include="orm\ServersConfigurationStore.cs" />
     <Compile Include="runners\BombaliServiceRunner.cs" />
     <Compile Include="orm\IPersistenceStore.cs" />

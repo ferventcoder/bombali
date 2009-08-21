@@ -87,6 +87,7 @@
     <Compile Include="infrastructure.app\monitorchecks\WebsiteCheckSpecs.cs" />
     <Compile Include="infrastructure.app\mapping\MapFromEmailConfigurationToCSVStringSpecs.cs" />
     <Compile Include="infrastructure.app\mapping\MapFromWebsiteConfigurationElementToIMonitorSpecs.cs" />
+    <Compile Include="infrastructure.app\settings\MonitorConfigurationCollectionSpecs.cs" />
     <Compile Include="infrastructure.app\settings\ServerConfigurationElementSpecs.cs" />
     <Compile Include="infrastructure.app\settings\ServerMonitorConfigurationCollectionSpecs.cs" />
     <Compile Include="infrastructure.app\settings\WebsiteConfigurationElementSpecs.cs" />

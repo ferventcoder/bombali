@@ -37,6 +37,15 @@ namespace bombali.infrastructure.app.settings
         }
 
         /// <summary>
+        /// Configuration section of items to monitor
+        /// </summary>
+        [ConfigurationProperty("itemsToMonitor", IsRequired = false, IsDefaultCollection = true)]
+        public MonitorConfigurationCollection items_to_monitor
+        {
+            get { return (MonitorConfigurationCollection)this["itemsToMonitor"]; }
+        }
+
+        /// <summary>
         /// Configuration section of default emails to mail to
         /// </summary>
         [ConfigurationProperty("defaultEmailsTo", IsRequired = false, IsDefaultCollection = true)]
