@@ -4,9 +4,9 @@ namespace bombali.infrastructure.app.mapping
     using domain;
     using infrastructure.mapping;
     using monitorchecks;
+    using resolvers;
     using settings;
     using timers;
-    using bombali.infrastructure.containers;
 
     public class MapFromMonitorConfigurationElementToIMonitor : IMapper<MonitorConfigurationElement, IMonitor>
     {
@@ -18,18 +18,6 @@ namespace bombali.infrastructure.app.mapping
                 emails_to = Map.from(BombaliConfiguration.settings.emails_to).to<String>();
             }
 
-            //Type generic = typeof(Container.get_an_instance_of<>);
-            //Type specific = generic.MakeGenericType(typeof(from.system_type));
-            //ConstructorInfo ci = specific.GetConstructor(new Type[] { });
-            //object o = ci.Invoke(new object[] { });
-
-            //Container.get_an_instance_of<>();
-            //http://www.google.com/search?hl=en&q=passing+runtime+Type+to+Generic&aq=f&oq=&aqi=
-            //http://stackoverflow.com/questions/513952/c-specifying-generic-collection-type-param-at-runtime
-
-            Type monitor = Type.GetType(from.system_type);
-            //ConstructorInfo ci = monitor.GetConstructor(new Type[] { });
-            
 
             return new Monitor(
                 string.IsNullOrEmpty(from.name) ? from.item_to_check : from.name,
@@ -38,9 +26,26 @@ namespace bombali.infrastructure.app.mapping
                 emails_to,
                 BombaliConfiguration.settings.email_from,
                 BombaliConfiguration.settings.smtp_host,
-                (ICheck)Container.get_an_instance_of(monitor.UnderlyingSystemType),
+                resolve_check_utility(from.system_type),
                 new DefaultTimer(from.minutes_between_checks)
                 );
+        }
+
+        public ICheck resolve_check_utility(string system_type)
+        {  
+            ICheck check_utility;
+           
+            object temp = DefaultInstanceCreator.create_object_from_string_type(system_type);
+            if (temp is ICheck)
+            {
+                check_utility = (ICheck)temp;
+
+            } else
+            {
+                check_utility = new WebsiteCheck();
+            }
+            
+            return check_utility;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace bombali.tests.infrastructure.containers.custom
     using developwithpassion.bdd.mbunit.standard;
     using developwithpassion.bdd.mbunit.standard.observations;
     using Rhino.Mocks;
-    using WindsorContainer=bombali.infrastructure.containers.custom.WindsorContainer;
+    using WindsorContainer = bombali.infrastructure.containers.custom.WindsorContainer;
 
     public class WindsorContainerSpecs
     {

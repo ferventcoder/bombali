@@ -82,17 +82,12 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="EmptyTestContainer.cs" />
-    <Compile Include="infrastructure.app\mapping\MapFromServerConfigurationElementToIMonitorSpecs.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromMonitorConfigurationElementToIMonitorSpecs.cs" />
     <Compile Include="infrastructure.app\monitorchecks\ServerCheckSpecs.cs" />
     <Compile Include="infrastructure.app\monitorchecks\WebsiteCheckSpecs.cs" />
     <Compile Include="infrastructure.app\mapping\MapFromEmailConfigurationToCSVStringSpecs.cs" />
-    <Compile Include="infrastructure.app\mapping\MapFromWebsiteConfigurationElementToIMonitorSpecs.cs" />
     <Compile Include="infrastructure.app\settings\MonitorConfigurationCollectionSpecs.cs" />
-    <Compile Include="infrastructure.app\settings\ServerConfigurationElementSpecs.cs" />
-    <Compile Include="infrastructure.app\settings\ServerMonitorConfigurationCollectionSpecs.cs" />
-    <Compile Include="infrastructure.app\settings\WebsiteConfigurationElementSpecs.cs" />
     <Compile Include="infrastructure.app\settings\EmailConfigurationElementSpecs.cs" />
-    <Compile Include="infrastructure.app\settings\WebsiteMonitorConfigurationCollectionSpecs.cs" />
     <Compile Include="infrastructure.app\settings\BombaliConfigurationSpecs.cs" />
     <Compile Include="infrastructure.app\settings\EmailConfigurationCollectionSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

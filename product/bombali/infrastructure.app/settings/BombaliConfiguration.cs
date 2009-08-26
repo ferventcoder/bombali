@@ -19,24 +19,6 @@ namespace bombali.infrastructure.app.settings
         }
 
         /// <summary>
-        /// Configuration section of websites to monitor
-        /// </summary>
-        [ConfigurationProperty("websitesToMonitor", IsRequired = false, IsDefaultCollection = true)]
-        public WebsiteMonitorConfigurationCollection sites_to_monitor
-        {
-            get { return (WebsiteMonitorConfigurationCollection)this["websitesToMonitor"]; }
-        }
-
-        /// <summary>
-        /// Configuration section of servers to monitor
-        /// </summary>
-        [ConfigurationProperty("serversToMonitor", IsRequired = false, IsDefaultCollection = true)]
-        public ServerMonitorConfigurationCollection servers_to_monitor
-        {
-            get { return (ServerMonitorConfigurationCollection)this["serversToMonitor"]; }
-        }
-
-        /// <summary>
         /// Configuration section of items to monitor
         /// </summary>
         [ConfigurationProperty("itemsToMonitor", IsRequired = false, IsDefaultCollection = true)]

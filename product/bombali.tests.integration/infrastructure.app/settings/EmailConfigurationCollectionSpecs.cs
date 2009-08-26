@@ -14,7 +14,7 @@ namespace bombali.tests.integration.infrastructure.app.settings
             [SetUp]
             public void setup_and()
             {
-                _config = BombaliConfiguration.settings.sites_to_monitor.Item(2).emails_to_send_to;
+                _config = BombaliConfiguration.settings.items_to_monitor.Item(2).emails_to_send_to;
             }
 
             [Test]

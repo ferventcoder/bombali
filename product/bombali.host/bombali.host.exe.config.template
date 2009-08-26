@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <configSections>
-    <section name="castle" type="Castle.Windsor.Configuration.AppDomain.CastleSectionHandler, Castle.Windsor" />
-    <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net"/>
-    <section name="bombali" type="bombali.infrastructure.app.settings.BombaliConfiguration, bombali"/>
+    <section name="castle"
+             type="Castle.Windsor.Configuration.AppDomain.CastleSectionHandler, Castle.Windsor" />
+    <section name="log4net"
+             type="log4net.Config.Log4NetConfigurationSectionHandler, log4net"/>
+    <section name="bombali"
+             type="bombali.infrastructure.app.settings.BombaliConfiguration, bombali"/>
   </configSections>
 
   <!-- 
@@ -28,29 +31,38 @@
         example = 1234567890@messaging.sprintpcs.com
   -->
 
-  <bombali smtpHost="${email.smtp_host}" emailFrom="${email.from}">
+  <bombali smtpHost="${email.smtp_host}"
+           emailFrom="${email.from}">
     <defaultEmailsTo>
       <add email="${email.to}" />
       <add email="email2@noreply.com" />
     </defaultEmailsTo>
-    <websitesToMonitor>
-      <add name="Yaho_MAIL" url="http://mail.yahoo.com" minutesBetweenChecks="2" />
-      <add name="Yaho_WEB" url="http://www.yahoo.com" minutesBetweenChecks="2">
+    <itemsToMonitor>
+      <add name="Yaho_MAIL"
+           url="http://mail.yahoo.com"
+           minutesBetweenChecks="2" />
+      <add name="Yaho_WEB"
+           url="http://www.yahoo.com"
+           minutesBetweenChecks="2">
         <emails>
           <add email="[10-digit phone number]@messaging.sprintpcs.com" />
           <add email="email3@noreply.com" />
         </emails>
       </add>
-    </websitesToMonitor>
-    <serversToMonitor>
-      <add name="Yahoo_MAIL_SERVER" url="mail.yahoo.com" minutesBetweenChecks="2" />
-      <add name="Yahoo_WEB_SERVER" url="www.yahoo.com" minutesBetweenChecks="2">
+      <add name="Yahoo_MAIL_SERVER"
+           item="mail.yahoo.com"
+           minutesBetweenChecks="2"
+           type="bombali.infrastructure.app.monitorchecks.ServerCheck, bombali" />
+      <add name="Yahoo_WEB_SERVER"
+           item="www.yahoo.com"
+           minutesBetweenChecks="2"
+           type="bombali.infrastructure.app.monitorchecks.ServerCheck, bombali" >
         <emails>
           <add email="number@messaging.sprintpcs.com" />
           <add email="email3@noreply.com" />
         </emails>
       </add>
-    </serversToMonitor>
+    </itemsToMonitor>
   </bombali>
 
   <castle>
@@ -60,8 +72,8 @@
                  type="bombali.infrastructure.logging.custom.Log4NetLogFactory, bombali"
                  />
       <component id="notifications.email"
-                       service="bombali.infrastructure.notifications.INotification, bombali"
-                       type="bombali.infrastructure.notifications.Email, bombali"
+                 service="bombali.infrastructure.notifications.INotification, bombali"
+                 type="bombali.infrastructure.notifications.Email, bombali"
                  />
 
       <component id="runners.bombaliServiceRunner"
@@ -71,41 +83,32 @@
         <parameters>
           <persistence_stores>
             <array>
-              <value>${orm.websitesConfigurationStore}</value>
-              <value>${orm.serversConfigurationStore}</value>
+              <value>${orm.monitorConfigurationStore}</value>
             </array>
           </persistence_stores>
         </parameters>
       </component>
 
-      <component id="orm.websitesConfigurationStore"
+      <component id="orm.monitorConfigurationStore"
                  service="bombali.orm.IPersistenceStore, bombali"
-                 type="bombali.orm.WebSitesConfigurationStore, bombali"
-                 />
-
-      <component id="orm.serversConfigurationStore"
-                 service="bombali.orm.IPersistenceStore, bombali"
-                 type="bombali.orm.ServersConfigurationStore, bombali"
+                 type="bombali.orm.MonitorConfigurationStore, bombali"
                  />
 
       <component id="map.EmailConfigurationToCSVString"
-              service="bombali.infrastructure.mapping.IMapper`2[[bombali.infrastructure.app.settings.EmailConfigurationCollection, bombali],[System.String]], bombali"
-              type="bombali.infrastructure.app.mapping.MapFromEmailConfigurationToCSVString, bombali"
+                 service="bombali.infrastructure.mapping.IMapper`2[[bombali.infrastructure.app.settings.EmailConfigurationCollection, bombali],[System.String]], bombali"
+                 type="bombali.infrastructure.app.mapping.MapFromEmailConfigurationToCSVString, bombali"
                  />
 
-      <component id="map.WebsiteConfigurationToIMonitor"
-                 service="bombali.infrastructure.mapping.IMapper`2[[bombali.infrastructure.app.settings.WebsiteConfigurationElement, bombali],[bombali.domain.IMonitor, bombali]], bombali"
-                 type="bombali.infrastructure.app.mapping.MapFromWebsiteConfigurationElementToIMonitor, bombali"
-                 />
-      <component id="map.ServerConfigurationToIMonitor"
-              service="bombali.infrastructure.mapping.IMapper`2[[bombali.infrastructure.app.settings.ServerConfigurationElement, bombali],[bombali.domain.IMonitor, bombali]], bombali"
-              type="bombali.infrastructure.app.mapping.MapFromServerConfigurationElementToIMonitor, bombali"
+      <component id="map.MonitorConfigurationToIMonitor"
+                 service="bombali.infrastructure.mapping.IMapper`2[[bombali.infrastructure.app.settings.MonitorConfigurationElement, bombali],[bombali.domain.IMonitor, bombali]], bombali"
+                 type="bombali.infrastructure.app.mapping.MapFromMonitorConfigurationElementToIMonitor, bombali"
                  />
     </components>
   </castle>
 
   <log4net>
-    <appender name="ColoredConsoleAppender" type="log4net.Appender.ColoredConsoleAppender">
+    <appender name="ColoredConsoleAppender"
+              type="log4net.Appender.ColoredConsoleAppender">
       <mapping>
         <level value="ERROR" />
         <foreColor value="White" />
@@ -129,14 +132,16 @@
       </layout>
     </appender>
 
-    <appender name="ConsoleAppender" type="log4net.Appender.ConsoleAppender">
+    <appender name="ConsoleAppender"
+              type="log4net.Appender.ConsoleAppender">
       <layout type="log4net.Layout.PatternLayout">
         <!--<conversionPattern value="%date [%thread] %-5level %logger [%ndc] - %message%newline" />-->
         <conversionPattern value="%message%newline"/>
       </layout>
     </appender>
 
-    <appender name="RollingLogFileAppender" type="log4net.Appender.RollingFileAppender">
+    <appender name="RollingLogFileAppender"
+              type="log4net.Appender.RollingFileAppender">
       <file value=".\logs\Bombali.Host.log"/>
       <appendToFile value="true"/>
       <maxSizeRollBackups value="10"/>
@@ -186,8 +191,9 @@
         <layout type="log4net.Layout.PatternLayout" value="%exception" />
       </parameter>
     </appender>-->
-    
-    <appender name="ErrorSmtpAppender" type="log4net.Appender.SmtpAppender">
+
+    <appender name="ErrorSmtpAppender"
+              type="log4net.Appender.SmtpAppender">
       <to value="${email.to.errors}"/>
       <from value="${email.from}"/>
       <subject value="Bombali Service Errors - ${machine}"/>
@@ -203,7 +209,8 @@
       </layout>
     </appender>
 
-    <appender name="ErrorEventLogAppender" type="log4net.Appender.EventLogAppender">
+    <appender name="ErrorEventLogAppender"
+              type="log4net.Appender.EventLogAppender">
       <LogName value="Application"/>
       <ApplicationName value="Bombali"/>
       <threshold value="ERROR"/>
