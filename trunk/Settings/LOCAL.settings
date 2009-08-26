@@ -16,6 +16,5 @@
   <property name="database.action" value="Create" />
 
   <!-- Castle Service Locators -->
-  <property name="orm.websitesConfigurationStore" value="${'${orm.websitesConfigurationStore}'}" />
-  <property name="orm.serversConfigurationStore" value="${'${orm.serversConfigurationStore}'}" />
+  <property name="orm.monitorConfigurationStore" value="${'${orm.monitorConfigurationStore}'}" />
 </project>

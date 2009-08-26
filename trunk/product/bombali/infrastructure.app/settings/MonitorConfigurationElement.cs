@@ -56,7 +56,7 @@ namespace bombali.infrastructure.app.settings
         /// <summary>
         /// What are we using to check?
         /// </summary>
-        [ConfigurationProperty("type", IsRequired = true)]
+        [ConfigurationProperty("type", IsRequired = false,DefaultValue="bombali.infrastructure.app.monitorchecks.WebsiteCheck, bombali")]
         public string system_type
         {
             get { return (string)this["type"]; }

@@ -23,7 +23,7 @@ namespace bombali.tests.integration.infrastructure.app.mapping
         {
             protected static object result;
 
-            because b = () => result = sut.map_from(BombaliConfiguration.settings.sites_to_monitor.Item(2).emails_to_send_to);
+            because b = () => result = sut.map_from(BombaliConfiguration.settings.items_to_monitor.Item(2).emails_to_send_to);
 
             [Observation]
             public void should_map_successfully()
