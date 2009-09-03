@@ -16,7 +16,7 @@
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
 
-  <target name="go" depends="error_check, custom_tasks_before, build, custom_tasks_after" description="Building" />
+  <target name="go" depends="error_check, custom_tasks_before, build, custom_tasks_after, report_finish_time" description="Building" />
 
   <target name="error_check">
     <fail message="You must provide arguments in your command line call like this: __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
@@ -58,6 +58,10 @@
     <echo message="Running custom master tasks if ${file.custom.master.build.after} or ${file.custom.master.build.after.legacy} exists." />
     <nant buildfile="${file.custom.master.build.after}" inheritall="true" if="${file::exists(file.custom.master.build.after)}" failonerror="false" />
     <nant buildfile="${file.custom.master.build.after.legacy}" inheritall="true" if="${file::exists(file.custom.master.build.after.legacy)}" failonerror="false" />
+  </target>
+  
+  <target name="report_finish_time">
+    <echo message="Build finished at ${datetime::now()}." />
   </target>
 
   <target name="get_revision">
