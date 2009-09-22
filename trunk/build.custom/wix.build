@@ -9,7 +9,7 @@
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
-  <property name="dirs.wix" value="${dirs.current}\..\lib\tools\WiX" overwrite="false" />
+  <property name="dirs.wix" value="${dirs.current}\..\lib\WiX" overwrite="false" />
   <property name="dirs.installer" value="${dirs.drop}\Installer" overwrite="false" />
   <property name="dirs.source.installer" value="${dirs.build}\..\Installer" overwrite="false" />
   <property name="dirs.source.installer.fullpath" value="${path::get-full-path(dirs.source.installer)}" />

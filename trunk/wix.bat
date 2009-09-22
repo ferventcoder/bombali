@@ -13,7 +13,7 @@ if '%1' == '/help' goto usage
 SET DIR=%~d0%~p0%
 
 SET build.config.settings="%DIR%Settings\UppercuT.config"
-"%DIR%lib\tools\Nant\nant.exe" %1 /f:.\BuildScripts.Custom\__master.build -D:build.config.settings=%build.config.settings%
+"%DIR%lib\Nant\nant.exe" %1 /f:.\build.custom\default.post.build -D:build.config.settings=%build.config.settings%
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
