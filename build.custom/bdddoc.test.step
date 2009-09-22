@@ -12,7 +12,7 @@
   <property name="file.test_results" value="mbunit-results" overwrite="false" />
   <property name="dirs.bdddoc_results" value="${dirs.build_artifacts}\bdddoc" overwrite="false" />
   <property name="files.bdddoc_results" value="${dirs.bdddoc_results}\bdddoc-results.html" overwrite="false" />
-  <property name="app.bdddoc" value="${path::get-full-path(dirs.lib)}\testing\bdddoc\bdddoc.console.exe" overwrite="false" />
+  <property name="app.bdddoc" value="${path::get-full-path(dirs.lib)}\bdddoc\bdddoc.console.exe" overwrite="false" />
   <property name="test_attribute" value="ObservationAttribute" overwrite="false" />
   <property name="test_assembly" value="__TEST_ASSEMBLY__" overwrite="false" />
 

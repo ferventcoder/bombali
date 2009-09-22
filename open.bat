@@ -5,5 +5,5 @@
 
 SET DIR=%~d0%~p0%
 
-SET build.config.settings="%DIR%Settings\UppercuT.config"
-"%DIR%lib\tools\Nant\nant.exe" %1 /f:.\BuildScripts\_open.build -D:build.config.settings=%build.config.settings%
+SET build.config.settings="%DIR%settings\UppercuT.config"
+"%DIR%lib\Nant\nant.exe" %1 /f:.\build\open.build -D:build.config.settings=%build.config.settings%

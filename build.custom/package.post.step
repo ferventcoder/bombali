@@ -8,9 +8,9 @@
   <target name="go" depends="add_setup_files" description="Packaging" />
 
   <target name="add_setup_files">
-    <echo message="Packaging setup files to ${dirs.drop}\${app.drop.folder}\Setup."/>
-    <copy todir="${dirs.drop}\${app.drop.folder}\Setup">
-      <fileset basedir="${dirs.build}\..\Setup">
+    <echo message="Packaging setup files to ${dirs.drop}\${app.drop.folder}\setup."/>
+    <copy todir="${dirs.drop}\${app.drop.folder}\setup">
+      <fileset basedir="${dirs.build}\..\setup">
         <include name="**/*.*" />
       </fileset>
     </copy>
