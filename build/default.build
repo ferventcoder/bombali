@@ -7,6 +7,7 @@
   <property name="repository.path" value="__REPOSITORY_PATH__" overwrite="false" />
   <property name="source_control_type" value="svn" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="version.uppercut" value="0" />
   <property name="version.revision" value="0" />
   <property name="version.build" value="0" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
@@ -15,7 +16,7 @@
   <property name="file.custom.step.after" value="${dirs.current}\..\build.custom\default.post.build" />
   <property name="file.custom.step.replace" value="${dirs.current}\..\build.custom\default.replace.build" />
 
-  <target name="go" depends="run_tasks, report_finish_time" />
+  <target name="go" depends="report_uppercut_version, run_tasks, report_finish_time" />
 
   <target name="run_tasks">
     <echo message="Running ${project::get-name()} tasks." />
@@ -73,7 +74,7 @@
   </target>
 
   <target name="report_finish_time">
-    <echo message="Build finished at ${datetime::now()}." />
+    <echo message="Build finished at ${datetime::now()} with UppercuT version ${version.uppercut}." />
   </target>
 
   <target name="get_revision">
@@ -105,5 +106,14 @@
   <target name="vss_get_revision" description="Gets the current revision number"></target>
   <target name="tfs_get_revision" description="Gets the current revision number"></target>
   <target name="vault_get_revision" description="Gets the current revision number"></target>
+
+  <target name="report_uppercut_version">
+    <xmlpeek
+      file="UppercuT.xml"
+      xpath="/uppercut/version"
+      property="version.uppercut"
+      failonerror="false" />
+    <echo message="Using UppercuT version: ${version.uppercut}." />
+  </target>
 
 </project>
