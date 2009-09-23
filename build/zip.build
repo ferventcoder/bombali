@@ -5,7 +5,8 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="project.name" value="__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__" overwrite="false" />
-  <property name="dirs.drop" value="${directory::get-parent-directory(project::get-buildfile-path())}\..\code_drop" overwrite="false" />
+  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="dirs.drop" value="${dirs.current}\..\code_drop" overwrite="false" />
   <property name="zip.file" value="${dirs.drop}\${project.name}.zip" />
   <property name="file.custom.step.before" value="${dirs.current}\..\build.custom\zip.pre.build" />
   <property name="file.custom.step.after" value="${dirs.current}\..\build.custom\zip.post.build" />
