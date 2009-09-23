@@ -37,6 +37,12 @@
     <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
   </target>
 
+   <target name="prepare">
+    <echo message="Removing and adding ${dirs.build}."/>
+    <delete dir="${dirs.build}" failonerror="false" />
+    <mkdir dir="${dirs.build}" failonerror="false" />
+  </target>
+  
   <target name="error_check">
     <fail message="You must provide arguments in your command line call like this: default.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' or pass the build configuration settings file default.build -D:build.config.settings='settings\Uppercut.config"
       if="${repository.path=='__REPOSITORY_PATH__'}" />
