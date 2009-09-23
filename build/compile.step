@@ -10,33 +10,47 @@
   <property name="msbuild.configuration" value="Release" overwrite="false" />
   <property name="msbuild.platform" value="Any CPU" overwrite="false" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
-  <property name="file.custom.step.before" value="${dirs.current}\..\build.custom\compile.pre.step" />
-  <property name="file.custom.step.after" value="${dirs.current}\..\build.custom\compile.post.step" />
-  <property name="file.custom.step.replace" value="${dirs.current}\..\build.custom\compile.replace.step" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="solution.path" value="${dirs.current}\..\${path_to_solution}\${project.name}.sln" />
   <property name="nant.settings.currentframework" value="${microsoft.framework}" />
-   <property name="dirs.documentation" value="docs" overwrite="false" />
+  <property name="dirs.documentation" value="docs" overwrite="false" />
   <property name="dirs.docs" value="${dirs.current}\..\${dirs.documentation}" />
   <property name="dirs.db.project" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
   <property name="dirs.db" value="${dirs.current}\..\${dirs.db.project}" />
+  <property name="file.custom.step.before" value="${dirs.current}\..\build.custom\compile.pre.step" />
+  <property name="file.custom.step.after" value="${dirs.current}\..\build.custom\compile.post.step" />
+  <property name="file.custom.step.replace" value="${dirs.current}\..\build.custom\compile.replace.step" />
 
-  <target name="go" depends="error_check, custom_tasks_before, cleanup, build_code, copy_documentation, copy_db, custom_tasks_after" description="Compiling project." />
+  <target name="go" depends="run_tasks" />
 
-  <target name="error_check">
-    <fail message="You must provide arguments to the command line like this default.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' OR compile.step -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file default.build -D:build.config.settings='settings\Uppercut.config"
-      if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
+  <target name="run_tasks">
+    <echo message="Running ${project::get-name()} tasks." />
+    <call target="prepare" if="${target::exists('prepare')}" />
+    <call target="custom_tasks_before" if="${target::exists('custom_tasks_before')}"  />
+    <call target="run_normal_tasks" if="${not file::exists(file.custom.step.replace)}" />
+    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <call target="custom_tasks_after" if="${target::exists('custom_tasks_after')}" />
   </target>
+
+  <target name="run_normal_tasks"
+          depends="error_check,build_code, copy_documentation, copy_db"
+          description="Compiling project." />
 
   <target name="custom_tasks_before">
     <echo message="Running custom tasks if ${file.custom.step.before} exists." />
     <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
   </target>
-  
-  <target name="cleanup">
+
+  <target name="prepare">
     <echo message="Removing and adding ${dirs.build}."/>
     <delete dir="${dirs.build}" failonerror="false" />
     <mkdir dir="${dirs.build}" failonerror="false" />
+  </target>
+
+  <target name="error_check">
+    <fail message="You must provide arguments to the command line like this default.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' OR compile.step -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' or pass the build configuration settings file default.build -D:build.config.settings='settings\Uppercut.config"
+      if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__'}" />
   </target>
 
   <target name="build_code" depends="" description="Building Library">
@@ -47,7 +61,7 @@
       <property name="Platform" value="${msbuild.platform}" />
     </msbuild>
   </target>
-  
+
   <target name="copy_documentation">
     <echo message="Building documentation files to ${dirs.build}\${dirs.documentation}."/>
     <copy todir="${dirs.build}\${dirs.documentation}">
@@ -56,7 +70,7 @@
       </fileset>
     </copy>
   </target>
-  
+
   <target name="copy_db">
     <echo message="Building database files to ${dirs.build}\${dirs.db.project}."/>
     <copy todir="${dirs.build}\${dirs.db.project}">
