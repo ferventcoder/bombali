@@ -35,10 +35,10 @@
   </target>
 
   <target name="build_environment_files" if="${directory::exists(dirs.environments.settings)}" >
-    <buildEnvironmentFiles
-      baseDirectory="${dirs.build}"
-      workingDirectory="${dirs.build.environmentfiles}"
+    <buildTemplateFiles
       settingsFilesDirectory="${dirs.environments.settings}"
+      templatesDirectory="${dirs.build}"
+      destinationDirectory="${dirs.build.environmentfiles}"
       />
   </target>
 
