@@ -13,11 +13,9 @@
   <property name="dirs.build" value="${dirs.current}\..\..\build_output" />
   <property name="dirs.build_artifacts" value="${dirs.build}\build_artifacts" />
   <property name="dirs.ncover_results" value="${path::get-full-path(dirs.build_artifacts)}\ncover" />
-
-  <property name="app.ncover.tester" value="${path::get-full-path(dirs.lib)}\references\MbUnit2\MbUnit.Cons.exe" overwrite="false" />
-  <property name="app.ncover" value="${path::get-full-path(dirs.lib)}\tools\NCover\NCover.Console.exe" overwrite="false" />
-  <property name="app.ncover_explorer" value="${path::get-full-path(dirs.lib)}\tools\NCover\NCoverExplorer.Console.exe" overwrite="false" />
-
+  <property name="app.ncover.tester" value="${path::get-full-path(dirs.lib)}\MbUnit2\MbUnit.Cons.exe" overwrite="false" />
+  <property name="app.ncover" value="${path::get-full-path(dirs.lib)}\NCover\NCover.Console.exe" overwrite="false" />
+  <property name="app.ncover.explorer" value="${path::get-full-path(dirs.lib)}\NCover\NCoverExplorer.Console.exe" overwrite="false" />
   <property name="file.ncover_results" value="${dirs.ncover_results}\${project.name}.ncover.xml" />
   <property name="file.ncover_log" value="${dirs.ncover_results}\${project.name}.ncover.log" />
   <property name="file.xml.code_coverage_results" value="${project.name}.CodeCoverageSummary-results.xml" />
@@ -26,10 +24,33 @@
   <property name="test.args" value="" />
   <property name="test.args" value="/rt:Text /rnf:mbUnit /rf:${dirs.ncover_results} /ec:${tests.excluded_categories.comma_separated}" if="${test.framework=='mbunit2'}" />
   <property name="test.args" value="/xml:${dirs.ncover_results}\nunit-results.xml /nologo /exclude:${tests.excluded_categories.comma_separated}" if="${test.framework=='nunit'}" />
+  <property name="file.custom.step.before" value="${dirs.current}\..\..\build.custom\analyzers\ncover.pre.step" />
+  <property name="file.custom.step.after" value="${dirs.current}\..\..\build.custom\analyzeers\ncover.post.step" />
+  <property name="file.custom.step.replace" value="${dirs.current}\..\..\build.custom\analyzers\ncover.replace.step" />
 
-  <target name="go" depends="cleanup, get_test_dlls, ncover, ncover_explorer" description="Using NCover to Analyze project for test quality indicators." if="${file::exists(app.ncover)}" />
+  <target name="go" depends="run_tasks" if="${file::exists(app.ncover)}" />
 
-  <target name="cleanup">
+  <target name="run_tasks">
+    <echo message="Running ${project::get-name()} tasks." />
+    <call target="prepare" if="${target::exists('prepare')}" />
+    <call target="custom_tasks_before" if="${target::exists('custom_tasks_before')}"  />
+    <call target="run_normal_tasks" if="${not file::exists(file.custom.step.replace)}" />
+    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <call target="custom_tasks_after" if="${target::exists('custom_tasks_after')}" />
+  </target>
+
+  <target name="run_normal_tasks"
+          depends="get_test_dlls, ncover, ncover_explorer"
+          description="Using NCover to Analyze project for test quality indicators."
+          if="${file::exists(app.ncover)}" />
+
+  <target name="custom_tasks_before">
+    <echo message="Running custom tasks if ${file.custom.step.before} exists." />
+    <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
+  </target>
+
+  <target name="prepare">
     <echo message="Removing and adding ${dirs.ncover_results}."/>
     <delete dir="${dirs.ncover_results}" failonerror="false" />
     <mkdir dir="${dirs.ncover_results}" />
@@ -58,7 +79,7 @@
     <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
 
-  <target name="ncover" if="${file::exists(app.ncover)}" >
+  <target name="ncover" if="${file::exists(app.ncover) and file::exists(app.ncover.tester)}" >
     <echo message="Attempting to run NCover. Creating file at ${file.ncover_results} and logging at ${file.ncover_log}." />
     <ncover program="${app.ncover}"
         commandLineExe="${app.ncover.tester}"
@@ -77,10 +98,10 @@
     </ncover>
   </target>
 
-  <target name="ncover_explorer" depends="ncover">
+  <target name="ncover_explorer" depends="ncover" if="${file::exists(app.ncover.explorer)}" >
     <echo message="Attempting to run NCoverExplorer. Creating HTML results file at ${file.html.code_coverage_results} and XML results file at ${file.xml.code_coverage_results}." />
     <ncoverexplorer
-      program="${app.ncover_explorer}"
+      program="${app.ncover.explorer}"
       projectName="${project.name}"
       reportType="4"
       outputDir="${dirs.ncover_results}"
@@ -113,6 +134,11 @@
       commandline="${path::get-full-path(dirs.ncover_results)}\${file.html.code_coverage_results}"
       >
     </exec>
+  </target>
+
+  <target name="custom_tasks_after">
+    <echo message="Running custom tasks if ${file.custom.step.after} exists." />
+    <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
   </target>
 
 </project>
