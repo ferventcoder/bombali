@@ -37,36 +37,15 @@
   </target>
 
   <target name="build_deployments" if="${directory::exists(dirs.deployment.templates)}" >
-    <foreach item="File" in="${dirs.deployment.settings}" property="settings.filename" if="${directory::exists(dirs.deployment.settings)}">
-      <if test="${string::ends-with(settings.filename, '.settings')}">
-        <echo message="I found environment ${path::get-file-name-without-extension(settings.filename)} with settings file ${path::get-file-name(settings.filename)}"/>
-
-        <include buildfile="${settings.filename}" failonerror="false"  />
-        <property name="settings.environment" value="${path::get-file-name-without-extension(settings.filename)}"/>
-
-        <!-- 
-          SETTINGS FILE FYI
-          If a property in any of the template files is not defined in the first settings file, the build will fail
-          If a property is defined in the first settings file and not the second, the build will succeed. It will use the value provided in the first settings file.
-          This could be bad, just make sure you define all properties in all settings files.
-        -->
-        <foreach item="File" in="${dirs.deployment.templates}" property="templates.filename" if="${directory::exists(dirs.deployment.templates)}">
-          <echo message="Taking template file ${path::get-file-name(templates.filename)} and creating destination file ${settings.environment}.${path::get-file-name(templates.filename)}"/>
-
-          <copy
-              file="${templates.filename}"
-              tofile="${dirs.deployment}\${settings.environment}.${path::get-file-name(templates.filename)}"
-              overwrite="true"
-              >
-            <filterchain>
-              <expandproperties />
-            </filterchain>
-          </copy>
-        </foreach>
-      </if>
-    </foreach>
+    <buildTemplateFiles
+      settingsFilesDirectory="${dirs.deployment.settings}"
+      templatesDirectory="${dirs.deployment.templates}"
+      destinationDirectory="${dirs.deployment}"
+      templateExtension=".BAT"
+      keepExtension="true"
+	  />
   </target>
-
+ 
   <target name="custom_tasks_after">
     <echo message="Running custom tasks if ${file.custom.step.after} exists." />
     <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
