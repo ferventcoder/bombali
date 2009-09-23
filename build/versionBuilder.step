@@ -5,13 +5,18 @@
   <property name="build.config.settings" value="__NONE__" overwrite="false" />
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="project.name" value="__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__" overwrite="false" />
+  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="dirs.build" value="${dirs.current}\..\build_output" />
+  <property name="sign.project_with_key" value="false" overwrite="false" />
+  <property name="app.strongname" value="${environment::get-folder-path('ProgramFiles')}\Microsoft SDKs\Windows\v6.0A\Bin\sn.exe" overwrite="false" />
+  <property name="file.key.name.private" value="${dirs.current}\..\${project.name}.snk" overwrite="false" />
+  <property name="file.key.name.public" value="${dirs.build}\public.${project.name}.snk" overwrite="false" />
   <property name="path_to_solution" value="." overwrite="false" />
   <property name="version.major" value="1" overwrite="false" />
   <property name="version.minor" value="0" overwrite="false" />
   <property name="company.name" value="__COMPANY_NAME__" overwrite="false" />
   <property name="language.short" value="cs" overwrite="false" />
   <property name="allow.partially_trusted_callers" value="true" overwrite="false" />
-  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
   <property name="version.build" value="0" overwrite="false" />
   <property name="version.revision" value="0" overwrite="false" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" overwrite="false" />
@@ -33,7 +38,7 @@
   </target>
 
   <target name="run_normal_tasks"
-          depends="error_check, determine_language, generate_assembly_info"
+          depends="error_check, determine_language, generate_key_file, generate_assembly_info"
           description="Generating Assembly File." />
 
   <target name="custom_tasks_before">
@@ -44,6 +49,22 @@
   <target name="error_check">
     <fail message="You must provide arguments to the command line like this __master.build -D:project.name='SOLUTION_NAME_WITHOUT_EXTENSION' -D:repository.path='FULL_PATH_TO_REPOSITORY' -D:company.name='Company name' or pass the build configuration settings file __master.build -D:build.config.settings='Settings\Uppercut.config"
       if="${project.name=='__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__' or company.name=='__COMPANY_NAME__'}" />
+  </target>
+
+  <target name="generate_key_file" description="Generates a .snk using the sn.exe tool if none exists and strong naming is specified" if="${sign.project_with_key}">
+    <echo message="Generating a strong name key (${file.key.name.private}) if it doesn't already exist." />
+    <exec 
+		program="${app.strongname}" 
+		commandline="-k ${file.key.name.private}" 
+		if="${file::exists(app.strongname) and not file::exists(file.key.name.private)}" 
+		/> 
+    <!-- this is the public / private key pair -->
+    <exec 
+		program="${app.strongname}" 
+		commandline="-p ${file.key.name.private} ${file.key.name.public}" 
+		if="${file::exists(app.strongname)}" 
+		/> 
+    <!-- this is just the public bit -->
   </target>
 
   <target name="determine_language">
@@ -73,6 +94,7 @@
         <attribute type="AssemblyCopyrightAttribute" value="${company.name}, original author or authors" />
         <attribute type="AssemblyCompanyAttribute" value="${company.name}" />
         <attribute type="AllowPartiallyTrustedCallers" if="${allow.partially_trusted_callers}" asis="true" />
+        <attribute type="AssemblyKeyFileAttribute" value="${file.key.name.private}" if="${file::exists(file.key.name.private)}" />
       </attributes>
     </asminfo>
   </target>
