@@ -14,7 +14,4 @@
   <!-- Database Deployment -->
   <property name="dirs.db" value="..\..\db" />
   <property name="database.action" value="Create" />
-
-  <!-- Castle Service Locators -->
-  <property name="orm.monitorConfigurationStore" value="${'${orm.monitorConfigurationStore}'}" />
 </project>
