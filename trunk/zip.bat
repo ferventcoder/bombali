@@ -9,8 +9,10 @@ call "%DIR%build.bat"
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
+SET NANT="%DIR%lib\Nant\nant.exe"
 SET build.config.settings="%DIR%settings\UppercuT.config"
-"%DIR%lib\Nant\nant.exe" %1 /f:.\build\zip.build -D:build.config.settings=%build.config.settings%
+
+%NANT% %1 /f:.\build\zip.build -D:build.config.settings=%build.config.settings%
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
