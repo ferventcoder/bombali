@@ -93,6 +93,7 @@
         verbose="true">
       <assemblies basedir="${dirs.build}">
         <exclude name="${dirs.build}\*Test*dll" />
+        <exclude name="${dirs.build}\*Spec*dll" />
         <include name="${dirs.build}\${project.name}*.dll" />
       </assemblies>
     </ncover>

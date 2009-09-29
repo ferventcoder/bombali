@@ -11,14 +11,15 @@ if '%1' == '?' goto usage
 if '%1' == '/help' goto usage
 
 SET DIR=%~d0%~p0%
-
+SET NANT="%DIR%lib\Nant\nant.exe"
 SET build.config.settings="%DIR%settings\UppercuT.config"
-"%DIR%lib\Nant\nant.exe" /f:.\build\compile.step -D:build.config.settings=%build.config.settings%
+
+%NANT% /f:.\build\compile.step -D:build.config.settings=%build.config.settings%
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
-"%DIR%lib\Nant\nant.exe" /f:.\build\analyzers\test.step %1 -D:build.config.settings=%build.config.settings%
-"%DIR%lib\Nant\nant.exe" /f:.\build\analyzers\test.step open_results -D:build.config.settings=%build.config.settings%
+%NANT% /f:.\build\analyzers\test.step %1 -D:build.config.settings=%build.config.settings%
+%NANT% /f:.\build\analyzers\test.step open_results -D:build.config.settings=%build.config.settings%
 
 if %ERRORLEVEL% NEQ 0 goto errors
 
