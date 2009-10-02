@@ -12,7 +12,8 @@
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
   <property name="dirs.build" value="${dirs.current}\..\build_output" />
   <property name="solution.path" value="${dirs.current}\..\${path_to_solution}\${project.name}.sln" />
-  <property name="nant.settings.currentframework" value="${microsoft.framework}" />
+  <property name="solution.path" value="${dirs.current}\..\${path_to_solution}\${project.name}.vbp" if="${microsoft.framework =='vb6'}" />
+  <property name="nant.settings.currentframework" value="${microsoft.framework}" if="${microsoft.framework !='vb6'}" />
   <property name="dirs.documentation" value="docs" overwrite="false" />
   <property name="dirs.docs" value="${dirs.current}\..\${dirs.documentation}" />
   <property name="dirs.db.project" value="__DATABASE_FOLDER_NAME__" overwrite="false" />
@@ -49,12 +50,21 @@
 
   <target name="build_code" depends="" description="Building Library">
     <echo message="Compiling ${solution.path}."/>
+     <call target="build_dotNET_code" if="${microsoft.framework !='vb6'}" />
+    <call target="build_vb6_code" if="${microsoft.framework =='vb6'}" />
+  </target>
+  
+  <target name="build_dotNET_code" >
     <msbuild project="${solution.path}" verbosity="quiet">
       <property name="Configuration" value="${msbuild.configuration}" />
       <property name="OutputPath" value="${dirs.build}" />
       <property name="Platform" value="${msbuild.platform}" />
     </msbuild>
   </target>
+
+  <target name="build_vb6_code">
+    <vb6 project="${solution.path}" outdir="${dirs.build}" />
+  </target>  
 
   <target name="copy_documentation">
     <echo message="Building documentation files to ${dirs.build}\${dirs.documentation}."/>
