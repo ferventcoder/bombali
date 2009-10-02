@@ -97,7 +97,7 @@
     <!-- try to update the revision -->
     <exec
       program="svn"
-      commandline="info --xml"
+      commandline="info ${directory::get-parent-directory(dirs.current)} --xml"
       output="_revision.xml"
       failonerror="false"/>
     <xmlpeek
