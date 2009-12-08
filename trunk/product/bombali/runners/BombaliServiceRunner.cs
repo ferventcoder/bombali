@@ -51,13 +51,13 @@ namespace bombali.runners
 
         private void runner_messages_received(object sender, MessageListEventArgs e)
         {
-            IEnumerable<MailMessageExtended> messages = e.Messages;
+            IEnumerable<SidePOPMailMessage> messages = e.Messages;
 
             const string subject = "Bombali Response";
             TimeSpan up_time_current = up_time.Elapsed;
             string text_message = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds.", ApplicationParameters.name, up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
 
-            foreach (MailMessageExtended message in messages)
+            foreach (SidePOPMailMessage message in messages)
             {
                 Log.bound_to(this).Info("{0} received a message from {1}. Responding that service is still running.",ApplicationParameters.name,message.From.Address);
             
