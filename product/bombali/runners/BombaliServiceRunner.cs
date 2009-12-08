@@ -9,7 +9,6 @@ namespace bombali.runners
     using infrastructure.logging;
     using infrastructure.notifications;
     using orm;
-    using sidepop.configuration;
     using sidepop.Mail;
     using sidepop.message.events;
     using sidepop.runners;
@@ -34,18 +33,11 @@ namespace bombali.runners
 
         private void configure_mail_watcher()
         {
-            foreach (AccountConfigurationElement account in SidePOPConfiguration.settings.accounts)
+            EmailWatcherConfigurator configurator = new SidePopRunnerXmlConfigurator();
+            foreach (EmailWatcher emailWatcher in configurator.configure())
             {
-                if (account.enabled)
-                {
-                    SidePopRunner runner = new SidePopRunner(new DefaultPop3Client(account.hostName, account.hostPort,
-                                                                            account.useSSL, account.userName,
-                                                                            account.password), account.minutes_between_checks);
-                    runner.MessagesReceived += runner_messages_received;
-                    runner.run();
-                    Log.bound_to(this).Info("{0} is configured to watch for messages with user {1} at {2} every {3} minutes.", ApplicationParameters.name,
-                                            account.userName, account.hostName, account.minutes_between_checks);
-                }
+                emailWatcher.MessagesReceived += runner_messages_received;
+                emailWatcher.start();
             }
         }
 
