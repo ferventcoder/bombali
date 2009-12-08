@@ -33,7 +33,7 @@ namespace bombali.runners
 
         private void configure_mail_watcher()
         {
-            EmailWatcherConfigurator configurator = new SidePopRunnerXmlConfigurator();
+            EmailWatcherConfigurator configurator = new SidePopXmlConfigurator();
             foreach (EmailWatcher emailWatcher in configurator.configure())
             {
                 emailWatcher.MessagesReceived += runner_messages_received;
