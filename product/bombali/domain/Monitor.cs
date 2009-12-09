@@ -28,6 +28,7 @@ namespace bombali.domain
 
             this.the_timer.Elapsed += the_timer_Elapsed;
             this.check_utility = check_utility;
+            status_is_good = true;
         }
 
         public string what_to_check { get; private set; }
@@ -36,10 +37,11 @@ namespace bombali.domain
         public string who_to_notify_as_comma_separated_list { get; private set; }
         public string who_notification_comes_from { get; private set; }
         public string notification_host { get; private set; }
+        public bool status_is_good { get; private set; }
 
         public void start_monitoring()
         {
-            Log.bound_to(this).Info("{0} has started a monitor \"{1}\" on thread {2}.",ApplicationParameters.name,name,Thread.CurrentThread.ManagedThreadId);
+            Log.bound_to(this).Info("{0} has started a monitor \"{1}\" on thread {2}.", ApplicationParameters.name, name, Thread.CurrentThread.ManagedThreadId);
             the_timer.start();
         }
 
@@ -57,12 +59,15 @@ namespace bombali.domain
 
         public void make_decision_based_on_check(bool current_request_considered_success)
         {
-            if(!current_request_considered_success && last_result_successful)
+            status_is_good = true;
+            if (!current_request_considered_success) status_is_good = false;
+
+            if (!current_request_considered_success && last_result_successful)
             {
                 last_result_successful = false;
                 send_notification(false, check_utility.last_response);
             }
-            if(current_request_considered_success && !last_result_successful)
+            if (current_request_considered_success && !last_result_successful)
             {
                 last_result_successful = true;
                 send_notification(true, check_utility.last_response);
@@ -72,7 +77,7 @@ namespace bombali.domain
         public void send_notification(bool success, string response)
         {
             string reporting_type = "BAD";
-            if(success) reporting_type = "GOOD";
+            if (success) reporting_type = "GOOD";
 
             string subject = string.Format("{0} - \"{1}\" {2}", ApplicationParameters.name, name, reporting_type);
             string message = string.Format("{0} reports {1} for {2}.", ApplicationParameters.name, response, what_to_check);

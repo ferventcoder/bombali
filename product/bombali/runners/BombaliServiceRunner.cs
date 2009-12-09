@@ -5,6 +5,7 @@ namespace bombali.runners
     using System.Diagnostics;
     using domain;
     using infrastructure;
+    using infrastructure.app.processors;
     using infrastructure.app.settings;
     using infrastructure.logging;
     using infrastructure.notifications;
@@ -15,11 +16,14 @@ namespace bombali.runners
 
     public class BombaliServiceRunner : IRunner
     {
+        private readonly IMailParser mail_processor;
         private readonly IList<IPersistenceStore> persistence_stores;
         private readonly Stopwatch up_time;
+        private IList<IMonitor> monitors;
 
-        public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores)
+        public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores, IMailParser mail_processor)
         {
+            this.mail_processor = mail_processor;
             this.persistence_stores = new List<IPersistenceStore>(persistence_stores);
             up_time = new Stopwatch();
             up_time.Start();
@@ -46,21 +50,43 @@ namespace bombali.runners
             IEnumerable<SidePOPMailMessage> messages = e.Messages;
 
             const string subject = "Bombali Response";
-            TimeSpan up_time_current = up_time.Elapsed;
-            string text_message = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds.", ApplicationParameters.name, up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
-
+            
             foreach (SidePOPMailMessage message in messages)
             {
-                Log.bound_to(this).Info("{0} received a message from {1}. Responding that service is still running.",ApplicationParameters.name,message.From.Address);
-            
+                MailQueryType query_type = mail_processor.parse(message);
+                Log.bound_to(this).Info("{0} received a message from {1} of type {2}.", ApplicationParameters.name, message.From.Address, query_type.ToString());
+
+                string response_text = string.Empty;
+
+                switch (query_type)
+                {
+                    case MailQueryType.Help:
+                        response_text = string.Format("Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0}", Environment.NewLine);
+                        break;
+                    case MailQueryType.Status:
+                        TimeSpan up_time_current = up_time.Elapsed;
+                        response_text = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds, thank you very much.", ApplicationParameters.name, up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
+                        break;
+                    case MailQueryType.CurrentDownItems:
+                        response_text = string.Format("Services currently down:{0}", Environment.NewLine);
+                        foreach (IMonitor monitor in monitors)
+                        {
+                            if (!monitor.status_is_good) response_text += string.Format("{0}{1}", monitor.name, Environment.NewLine);
+                        }
+                        break;
+                    default:
+                        response_text = string.Format("{0} has not been implemented yet. Please watch for updates.",query_type.ToString());
+                        break;
+                }
+
                 SendNotification.from(BombaliConfiguration.settings.email_from).to(message.From.Address).with_subject(
-                subject).with_message(text_message).and_use_notification_host(BombaliConfiguration.settings.smtp_host);
+                subject).with_message(response_text).and_use_notification_host(BombaliConfiguration.settings.smtp_host);
             }
         }
 
         private void start_monitoring()
         {
-            IList<IMonitor> monitors = new List<IMonitor>();
+            monitors = new List<IMonitor>();
 
             foreach (IPersistenceStore persistence_store in persistence_stores)
             {
