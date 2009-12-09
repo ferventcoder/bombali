@@ -39,7 +39,7 @@ namespace bombali.domain
 
         public void start_monitoring()
         {
-            Log.bound_to(this).Info("Monitor {0} has started monitoring on thread {1}.",name,Thread.CurrentThread.ManagedThreadId);
+            Log.bound_to(this).Info("{0} has started a monitor \"{1}\" on thread {2}.",ApplicationParameters.name,name,Thread.CurrentThread.ManagedThreadId);
             the_timer.start();
         }
 
