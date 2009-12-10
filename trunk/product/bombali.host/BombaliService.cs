@@ -6,11 +6,22 @@ namespace bombali.host
 {
     using System;
     using System.ServiceProcess;
+    using Castle.Core;
+    using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     using Castle.Windsor.Configuration.Interpreters;
+    using FluentNHibernate.Cfg;
+    using FluentNHibernate.Cfg.Db;
     using infrastructure;
+    using infrastructure.data.accessors;
     using log4net;
+    using NHibernate;
+    using NHibernate.Cfg;
+    using NHibernate.Event;
+    using NHibernate.Tool.hbm2ddl;
+    using orm;
     using runners;
+    using Environment=System.Environment;
 
     public partial class BombaliService : ServiceBase
     {
@@ -46,7 +57,38 @@ namespace bombali.host
         {
             _logger.Debug("Attempting to initialize IOC container.");
             _container = new WindsorContainer(new XmlInterpreter());
+            _container.Register( 
+                Component.For(typeof(Repository)).Forward<IRepository>().ImplementedBy<Repository>(). 
+                    Interceptors(InterceptorReference.ForType<LockInterceptor>() 
+                                 //,InterceptorReference.ForType<TransactionInterceptor>() 
+                                 ).Anywhere 
+                    );
+            _container.Kernel.AddComponentInstance("nhFactory",typeof(ISessionFactory),build_session_factory());
             infrastructure.containers.Container.initialize_with(new infrastructure.containers.custom.WindsorContainer(_container));
+        }
+
+        private static ISessionFactory build_session_factory()
+        {
+            return Fluently.Configure()
+                    .Database(MsSqlConfiguration.MsSql2005
+                        .ConnectionString(c =>
+                            c.FromConnectionStringWithKey("bombali")))
+                    .Mappings(m =>
+                        m.FluentMappings.AddFromAssemblyOf<EmailMapping>())
+                    .ExposeConfiguration(cfg =>
+                    {
+                        cfg.SetListener(ListenerType.PreInsert, new AuditEventListener());
+                        cfg.SetListener(ListenerType.PreUpdate, new AuditEventListener());
+                        //build_schema(cfg);
+                    })
+                    .BuildSessionFactory();
+        }
+
+        private static void build_schema(Configuration cfg)
+        {
+            SchemaExport schema_export = new SchemaExport(cfg);
+            schema_export.SetOutputFile(@"..\..\..\..\bombali.database\Bombali\Up\0001_CreateTables.sql");
+            schema_export.Create(true,false);
         }
 
         protected override void OnStop()

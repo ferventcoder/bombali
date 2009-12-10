@@ -1,0 +1,15 @@
+# Microsoft Developer Studio Project File - Database Project
+Begin DataProject = "bombali.database"
+   MSDTVersion = "80"
+   Begin Folder = "Bombali"
+      Begin Folder = "permissions"
+      End
+      Begin Folder = "up"
+         Script = "0001_Bombali_CreateStructures.sql"
+      End
+      Begin Folder = "views"
+      End
+   End
+   Begin DBRefFolder = "Database References"
+   End
+End

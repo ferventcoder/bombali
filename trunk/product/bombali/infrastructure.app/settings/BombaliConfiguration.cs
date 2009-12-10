@@ -54,5 +54,14 @@ namespace bombali.infrastructure.app.settings
             get { return (string)this["smtpHost"]; }
         }
 
+        /// <summary>
+        /// The email of the administrator
+        /// </summary>
+        [ConfigurationProperty("administratorEmail", IsRequired = true)]
+        public string administrator_email
+        {
+            get { return (string)this["administratorEmail"]; }
+        }
+
     }
 }

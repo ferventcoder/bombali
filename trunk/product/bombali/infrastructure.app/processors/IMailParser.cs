@@ -1,9 +1,10 @@
 namespace bombali.infrastructure.app.processors
 {
-    using sidepop.Mail;
-
+    using System.Collections.Generic;
+    using domain;
+    
     public interface IMailParser
     {
-        MailQueryType parse(SidePOPMailMessage message);
+        MailQueryType parse(Email message, IList<IMonitor> monitors, IDictionary<string, ApprovalType> authorization_dictionary);
     }
 }

@@ -7,23 +7,31 @@ namespace bombali.runners
     using infrastructure;
     using infrastructure.app.processors;
     using infrastructure.app.settings;
+    using infrastructure.data.accessors;
     using infrastructure.logging;
+    using infrastructure.mapping;
     using infrastructure.notifications;
     using orm;
+    using sidepop.infrastructure.extensions;
     using sidepop.Mail;
     using sidepop.message.events;
     using sidepop.runners;
+    using Email = bombali.domain.Email;
+    using Version = bombali.infrastructure.information.Version;
 
     public class BombaliServiceRunner : IRunner
     {
         private readonly IMailParser mail_processor;
+        private readonly IRepository repository;
         private readonly IList<IPersistenceStore> persistence_stores;
         private readonly Stopwatch up_time;
         private IList<IMonitor> monitors;
+        private IDictionary<string, ApprovalType> authorization_dictionary;
 
-        public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores, IMailParser mail_processor)
+        public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores, IMailParser mail_processor, IRepository repository)
         {
             this.mail_processor = mail_processor;
+            this.repository = repository;
             this.persistence_stores = new List<IPersistenceStore>(persistence_stores);
             up_time = new Stopwatch();
             up_time.Start();
@@ -33,6 +41,22 @@ namespace bombali.runners
         {
             configure_mail_watcher();
             start_monitoring();
+            set_up_authorization_dictionary();
+        }
+
+        private void set_up_authorization_dictionary()
+        {
+            authorization_dictionary = new Dictionary<string, ApprovalType>();
+            foreach (IMonitor monitor in monitors)
+            {
+                foreach (string email_address in monitor.who_to_notify_as_comma_separated_list.Split(','))
+                {
+                    if (!authorization_dictionary.ContainsKey(email_address.to_lower()))
+                    {
+                        authorization_dictionary.Add(email_address.to_lower(), ApprovalType.Approved);
+                    }
+                }
+            }
         }
 
         private void configure_mail_watcher()
@@ -49,38 +73,87 @@ namespace bombali.runners
         {
             IEnumerable<SidePOPMailMessage> messages = e.Messages;
 
-            const string subject = "Bombali Response";
-            
             foreach (SidePOPMailMessage message in messages)
             {
-                MailQueryType query_type = mail_processor.parse(message);
-                Log.bound_to(this).Info("{0} received a message from {1} of type {2}.", ApplicationParameters.name, message.From.Address, query_type.ToString());
+                Email mail_message = Map.from(message).to<Email>();
+                repository.save_or_update(mail_message);
+                parse_and_send_response(mail_message);
+            }
+        }
 
-                string response_text = string.Empty;
+        private void parse_and_send_response(Email mail_message)
+        {
+            string respond_to = mail_message.from_address.to_lower();
+            MailQueryType query_type = mail_processor.parse(mail_message, monitors, authorization_dictionary);
+            Log.bound_to(this).Info("{0} received a message from {1} of type {2}.", ApplicationParameters.name, respond_to, query_type.ToString());
 
-                switch (query_type)
+            string response_text = string.Empty;
+
+            if (query_type == MailQueryType.Authorized || query_type == MailQueryType.Denied)
+            {
+                string[] body_words = mail_message.message_body.Split(' ');
+                foreach (string body_word in body_words)
                 {
-                    case MailQueryType.Help:
-                        response_text = string.Format("Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0}", Environment.NewLine);
+                    if (body_word.Contains("@"))
+                    {
+                        respond_to = body_word;
                         break;
-                    case MailQueryType.Status:
-                        TimeSpan up_time_current = up_time.Elapsed;
-                        response_text = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds, thank you very much.", ApplicationParameters.name, up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
-                        break;
-                    case MailQueryType.CurrentDownItems:
-                        response_text = string.Format("Services currently down:{0}", Environment.NewLine);
-                        foreach (IMonitor monitor in monitors)
+                    }
+                }
+            }
+
+            switch (query_type)
+            {
+                case MailQueryType.Denied:
+                    authorization_dictionary.Add(respond_to, ApprovalType.Denied);
+                    return;
+                    break;
+                case MailQueryType.Authorized:
+                    authorization_dictionary.Add(respond_to, ApprovalType.Approved);
+                    response_text = string.Format("Congratulations - you have been approved!{0}Send 'help' for options", Environment.NewLine);
+                    break;
+                case MailQueryType.Help:
+                    response_text =
+                        string.Format(
+                            "Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0}version - current version",
+                            Environment.NewLine);
+                    break;
+                case MailQueryType.Status:
+                    TimeSpan up_time_current = up_time.Elapsed;
+                    response_text = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds.", ApplicationParameters.name,
+                                                  up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
+                    break;
+                case MailQueryType.CurrentDownItems:
+                    response_text = string.Format("Services currently down:{0}", Environment.NewLine);
+                    foreach (IMonitor monitor in monitors)
+                    {
+                        if (monitor.who_to_notify_as_comma_separated_list.to_lower().Contains(respond_to))
                         {
                             if (!monitor.status_is_good) response_text += string.Format("{0}{1}", monitor.name, Environment.NewLine);
                         }
-                        break;
-                    default:
-                        response_text = string.Format("{0} has not been implemented yet. Please watch for updates.",query_type.ToString());
-                        break;
-                }
+                    }
+                    break;
+                case MailQueryType.Authorizing:
+                    response_text =
+                        string.Format("Bombali has notified the admin to add you to the authorized list. If you are added, you will receive another response.");
+                    break;
+                case MailQueryType.Version:
+                    response_text = string.Format("Bombali is currently running version {0}.", Version.get_version());
+                    break;
+                default:
+                    response_text = string.Format("{0} has not been implemented yet. Please watch for updates.", query_type);
+                    break;
+            }
 
-                SendNotification.from(BombaliConfiguration.settings.email_from).to(message.From.Address).with_subject(
-                subject).with_message(response_text).and_use_notification_host(BombaliConfiguration.settings.smtp_host);
+
+            if (query_type != MailQueryType.Denied)
+            {
+                SendNotification
+                    .from(BombaliConfiguration.settings.email_from)
+                    .to(respond_to)
+                    .with_subject("Bombali Response")
+                    .with_message(response_text)
+                    .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
             }
         }
 
