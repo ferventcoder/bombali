@@ -57,7 +57,7 @@ namespace bombali.runners
                     if (!authorization_dictionary.ContainsKey(email_address.to_lower()))
                     {
                         authorization_dictionary.Add(email_address.to_lower(), ApprovalType.Approved);
-                        Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name,email_address.to_lower());
+                        Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name, email_address.to_lower());
                     }
                 }
             }
@@ -87,7 +87,7 @@ namespace bombali.runners
 
         private void save_email_message(Email mail_message)
         {
-            Log.bound_to(this).Info("{0} is archiving message \"{1}\".",ApplicationParameters.name,mail_message.message_id);
+            Log.bound_to(this).Info("{0} is archiving message \"{1}\".", ApplicationParameters.name, mail_message.message_id);
             repository.save_or_update(mail_message);
         }
 
@@ -106,7 +106,7 @@ namespace bombali.runners
                 {
                     if (body_word.Contains("@"))
                     {
-                        respond_to = body_word;
+                        respond_to = body_word.Replace(Environment.NewLine, "");
                         break;
                     }
                 }
@@ -125,7 +125,7 @@ namespace bombali.runners
                 case MailQueryType.Help:
                     response_text =
                         string.Format(
-                            "Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0}version - current version",
+                            "Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0} version - current version",
                             Environment.NewLine);
                     break;
                 case MailQueryType.Status:
@@ -155,16 +155,23 @@ namespace bombali.runners
                     break;
             }
 
+            SendNotification
+                .from(BombaliConfiguration.settings.email_from)
+                .to(respond_to)
+                .with_subject("Bombali Response")
+                .with_message(response_text)
+                .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
 
-            if (query_type != MailQueryType.Denied)
+            if (query_type == MailQueryType.Authorizing)
             {
                 SendNotification
-                    .from(BombaliConfiguration.settings.email_from)
-                    .to(respond_to)
-                    .with_subject("Bombali Response")
-                    .with_message(response_text)
-                    .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
+                .from(BombaliConfiguration.settings.email_from)
+                .to(BombaliConfiguration.settings.administrator_email)
+                .with_subject("Bombali Request")
+                .with_message(string.Format("{0} reqests approval. Send approve/deny w/email address. Ex. 'deny bob@nowhere.com'", respond_to))
+                .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
             }
+
         }
 
         private void start_monitoring()

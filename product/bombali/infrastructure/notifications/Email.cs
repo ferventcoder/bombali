@@ -8,6 +8,7 @@ namespace bombali.infrastructure.notifications
     {
         public void send_notification(string notification_host, string from, string to, string subject, string message)
         {
+            to = to.Replace(Environment.NewLine, "");
             MailMessage message_to_send = new MailMessage();
             message_to_send.From = new MailAddress(from);
             message_to_send.To.Add(to);
