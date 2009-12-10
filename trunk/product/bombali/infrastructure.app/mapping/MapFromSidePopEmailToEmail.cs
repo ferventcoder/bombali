@@ -4,6 +4,7 @@ namespace bombali.infrastructure.app.mapping
     using System.Text;
     using domain;
     using infrastructure.mapping;
+    using logging;
     using sidepop.infrastructure.extensions;
     using sidepop.Mail;
 
@@ -11,6 +12,7 @@ namespace bombali.infrastructure.app.mapping
     {
         public Email map_from(SidePOPMailMessage from)
         {
+            Log.bound_to(this).Debug("{0} is mapping message \"{1}\" to a domain type email message for processing and archival.",ApplicationParameters.name,from.MessageId);
             Email email = new Email
                               {
                                   // message metadata
