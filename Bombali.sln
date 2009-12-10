@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bombali.tests", "product\bo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bombali.tests.integration", "product\bombali.tests.integration\bombali.tests.integration.csproj", "{C49C697D-2A32-42EF-8610-D1C52E4C66D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A8530C77-2D41-47E0-A569-4F00FA3128D0}"
+EndProject
+Project("{4F174C21-8C12-11D0-8340-0000F80270F8}") = "bombali.database", "bombali.database\bombali.database.dbp", "{E67D4269-F1C1-422C-9267-C1BA3E8E52FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,5 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{466C3422-918F-4E4B-BD81-C4E71D33F66C} = {A8530C77-2D41-47E0-A569-4F00FA3128D0}
+		{C49C697D-2A32-42EF-8610-D1C52E4C66D6} = {A8530C77-2D41-47E0-A569-4F00FA3128D0}
 	EndGlobalSection
 EndGlobal

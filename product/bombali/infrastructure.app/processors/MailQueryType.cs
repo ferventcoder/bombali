@@ -5,6 +5,10 @@ namespace bombali.infrastructure.app.processors
         Help,
         Status,
         Configuration,
-        CurrentDownItems
+        CurrentDownItems,
+        Authorizing,
+        Authorized,
+        Denied,
+        Version
     }
 }

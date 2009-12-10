@@ -49,9 +49,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="FluentNHibernate, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8aa435e3cb308880, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NHibernate\FluentNHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NHibernate\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="sidePOP, Version=0.0.0.6, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -77,8 +85,11 @@
     <Compile Include="..\..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="domain\ApprovalType.cs" />
+    <Compile Include="domain\Email.cs" />
     <Compile Include="domain\Monitor.cs" />
     <Compile Include="infrastructure.app\mapping\MapFromMonitorConfigurationElementToIMonitor.cs" />
+    <Compile Include="infrastructure.app\mapping\MapFromSidePopEmailToEmail.cs" />
     <Compile Include="infrastructure.app\monitorchecks\ICheck.cs" />
     <Compile Include="infrastructure.app\monitorchecks\MSMQCountUnder3000.cs" />
     <Compile Include="infrastructure.app\monitorchecks\ServerCheck.cs" />
@@ -93,6 +104,15 @@
     <Compile Include="infrastructure.app\publishers\MassTransitPublisher.cs" />
     <Compile Include="infrastructure.app\settings\MonitorConfigurationElement.cs" />
     <Compile Include="infrastructure.app\settings\MonitorConfigurationCollection.cs" />
+    <Compile Include="infrastructure\data.accessors\Auditable.cs" />
+    <Compile Include="infrastructure\data.accessors\AuditEventListener.cs" />
+    <Compile Include="infrastructure\data.accessors\IRepository.cs" />
+    <Compile Include="infrastructure\data.accessors\LockAttribute.cs" />
+    <Compile Include="infrastructure\data.accessors\LockInterceptor.cs" />
+    <Compile Include="infrastructure\data.accessors\Repository.cs" />
+    <Compile Include="infrastructure\data.accessors\TransactionAttribute.cs" />
+    <Compile Include="infrastructure\data.accessors\TransactionInterceptor.cs" />
+    <Compile Include="infrastructure\information\Version.cs" />
     <Compile Include="infrastructure\notifications\Email.cs" />
     <Compile Include="infrastructure\notifications\NotificationBuilder.cs" />
     <Compile Include="infrastructure\notifications\INotification.cs" />
@@ -101,6 +121,7 @@
     <Compile Include="domain\IMonitor.cs" />
     <Compile Include="infrastructure\resolvers\DefaultInstanceCreator.cs" />
     <Compile Include="orm\MonitorConfigurationStore.cs" />
+    <Compile Include="orm\EmailMapping.cs" />
     <Compile Include="runners\BombaliServiceRunner.cs" />
     <Compile Include="orm\IPersistenceStore.cs" />
     <Compile Include="infrastructure\timers\TimerElaspedEventHandler.cs" />
