@@ -46,7 +46,10 @@ namespace bombali.runners
 
         private void set_up_authorization_dictionary()
         {
+            Log.bound_to(this).Info("{0} is setting up the authorized users list.", ApplicationParameters.name);
             authorization_dictionary = new Dictionary<string, ApprovalType>();
+            authorization_dictionary.Add(BombaliConfiguration.settings.administrator_email, ApprovalType.Approved);
+            Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name, BombaliConfiguration.settings.administrator_email);
             foreach (IMonitor monitor in monitors)
             {
                 foreach (string email_address in monitor.who_to_notify_as_comma_separated_list.Split(','))
@@ -54,6 +57,7 @@ namespace bombali.runners
                     if (!authorization_dictionary.ContainsKey(email_address.to_lower()))
                     {
                         authorization_dictionary.Add(email_address.to_lower(), ApprovalType.Approved);
+                        Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name,email_address.to_lower());
                     }
                 }
             }
@@ -76,9 +80,15 @@ namespace bombali.runners
             foreach (SidePOPMailMessage message in messages)
             {
                 Email mail_message = Map.from(message).to<Email>();
-                repository.save_or_update(mail_message);
                 parse_and_send_response(mail_message);
+                save_email_message(mail_message);
             }
+        }
+
+        private void save_email_message(Email mail_message)
+        {
+            Log.bound_to(this).Info("{0} is archiving message \"{1}\".",ApplicationParameters.name,mail_message.message_id);
+            repository.save_or_update(mail_message);
         }
 
         private void parse_and_send_response(Email mail_message)
