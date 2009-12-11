@@ -145,7 +145,7 @@ namespace bombali.runners
                     break;
                 case MailQueryType.Authorizing:
                     response_text =
-                        string.Format("Bombali has notified the admin to add you to the authorized list. If you are added, you will receive another response.");
+                        string.Format("Bombali notified admin to add you to approved list. If you are added, you will receive a response.");
                     break;
                 case MailQueryType.Version:
                     response_text = string.Format("Bombali is currently running version {0}.", Version.get_version());
