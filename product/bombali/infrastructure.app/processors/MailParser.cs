@@ -23,7 +23,6 @@ namespace bombali.infrastructure.app.processors
                 }
             }
 
-
             if (user_is_authorized)
             {
                 query_type = MailQueryType.Help;
