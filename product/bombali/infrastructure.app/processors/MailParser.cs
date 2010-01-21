@@ -3,7 +3,6 @@ namespace bombali.infrastructure.app.processors
     using System.Collections.Generic;
     using domain;
     using sidepop.infrastructure.extensions;
-    using sidepop.Mail;
 
     public class MailParser : IMailParser
     {
@@ -26,14 +25,18 @@ namespace bombali.infrastructure.app.processors
             if (user_is_authorized)
             {
                 query_type = MailQueryType.Help;
-                string subject_and_body = message.subject + "|" + message.message_body;
+                string subject_and_body = message.subject + " | " + message.message_body;
 
-                if (message_contains_status(subject_and_body)) query_type = MailQueryType.Status;
-                if (message_contains_config(subject_and_body)) query_type = MailQueryType.Configuration;
-                if (message_contains_down(subject_and_body)) query_type = MailQueryType.CurrentDownItems;
-                if (message_contains_approve(subject_and_body)) query_type = MailQueryType.Authorized;
-                if (message_contains_deny(subject_and_body)) query_type = MailQueryType.Denied;
-                if (message_contains_version(subject_and_body)) query_type = MailQueryType.Version;
+                string[] message_words = subject_and_body.Split(' ');
+                foreach (string message_word in message_words)
+                {
+                    if (message_contains_status(message_word)) { query_type = MailQueryType.Status; break; }
+                    if (message_contains_config(message_word)) { query_type = MailQueryType.Configuration; break; }
+                    if (message_contains_down(message_word)) { query_type = MailQueryType.CurrentDownItems; break; }
+                    if (message_contains_approve(message_word)) { query_type = MailQueryType.Authorized; break; }
+                    if (message_contains_deny(message_word)) { query_type = MailQueryType.Denied; break; }
+                    if (message_contains_version(message_word)) { query_type = MailQueryType.Version; break; }
+                }
             }
 
             return query_type;
