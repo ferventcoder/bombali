@@ -196,7 +196,7 @@
               type="log4net.Appender.SmtpAppender">
       <to value="${email.to.errors}"/>
       <from value="${email.from}"/>
-      <subject value="Bombali Service Errors - ${machine}"/>
+      <subject value="Bombali Service Errors - ${environment}"/>
       <smtpHost value="${email.smtp_host}"/>
       <bufferSize value="2"/>
       <lossy value="true"/>
