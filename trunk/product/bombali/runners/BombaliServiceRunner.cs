@@ -48,7 +48,7 @@ namespace bombali.runners
         {
             Log.bound_to(this).Info("{0} is setting up the authorized users list.", ApplicationParameters.name);
             authorization_dictionary = new Dictionary<string, ApprovalType>();
-            authorization_dictionary.Add(BombaliConfiguration.settings.administrator_email, ApprovalType.Approved);
+            authorization_dictionary.Add(BombaliConfiguration.settings.administrator_email.to_lower(), ApprovalType.Approved);
             Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name, BombaliConfiguration.settings.administrator_email);
             foreach (IMonitor monitor in monitors)
             {
@@ -75,13 +75,22 @@ namespace bombali.runners
 
         private void runner_messages_received(object sender, MessageListEventArgs e)
         {
-            IEnumerable<SidePOPMailMessage> messages = e.Messages;
-
-            foreach (SidePOPMailMessage message in messages)
+            try
             {
-                Email mail_message = Map.from(message).to<Email>();
-                parse_and_send_response(mail_message);
-                save_email_message(mail_message);
+                IEnumerable<SidePOPMailMessage> messages = e.Messages;
+
+                foreach (SidePOPMailMessage message in messages)
+                {
+                    Email mail_message = Map.from(message).to<Email>();
+                    parse_and_send_response(mail_message);
+                    save_email_message(mail_message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.bound_to(this).Error("{0} service had an error processing messages on {1} (with user {2}):{3}{4}", ApplicationParameters.name,
+                                    Environment.MachineName, Environment.UserName,
+                                    Environment.NewLine, ex.ToString());
             }
         }
 
@@ -119,13 +128,16 @@ namespace bombali.runners
                     return;
                     break;
                 case MailQueryType.Authorized:
-                    authorization_dictionary.Add(respond_to, ApprovalType.Approved);
+                    if (!authorization_dictionary.ContainsKey(respond_to.to_lower()))
+                    {
+                        authorization_dictionary.Add(respond_to.to_lower(), ApprovalType.Approved);
+                    }
                     response_text = string.Format("Congratulations - you have been approved!{0}Send 'help' for options", Environment.NewLine);
                     break;
                 case MailQueryType.Help:
                     response_text =
                         string.Format(
-                            "Options - send one:{0} help - this menu{0} status - up time{0} config - all monitors{0} down - current monitors in error{0} version - current version",
+                            "Options - send one:{0}help - this menu{0}status - up time{0}config - all monitors{0}down - monitors in error{0}version - current version",
                             Environment.NewLine);
                     break;
                 case MailQueryType.Status:
@@ -158,7 +170,7 @@ namespace bombali.runners
             SendNotification
                 .from(BombaliConfiguration.settings.email_from)
                 .to(respond_to)
-                .with_subject("Bombali Response")
+                .with_subject("Bombali")
                 .with_message(response_text)
                 .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
 
@@ -167,7 +179,7 @@ namespace bombali.runners
                 SendNotification
                 .from(BombaliConfiguration.settings.email_from)
                 .to(BombaliConfiguration.settings.administrator_email)
-                .with_subject("Bombali Request")
+                .with_subject("Bombali")
                 .with_message(string.Format("{0} reqests approval. Send approve/deny w/email address. Ex. 'deny bob@nowhere.com'", respond_to))
                 .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
             }
