@@ -14,6 +14,7 @@
         
         AllTel: [10-digit phone number]@message.alltel.com
         AT&T: [10-digit phone number]@txt.att.net
+        AT&T: [10-digit phone number]@mms.att.net
         Boost Mobile: [10-digit phone number]@myboostmobile.com
         Cellular One: [10-digit phone number]@mobile.celloneusa.com
         Cingular: [10-digit phone number]@cingularme.com 
