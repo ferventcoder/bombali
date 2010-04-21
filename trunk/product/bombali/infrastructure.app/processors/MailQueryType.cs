@@ -9,6 +9,8 @@ namespace bombali.infrastructure.app.processors
         Authorizing,
         Authorized,
         Denied,
-        Version
+        Version,
+        Subscribe,
+        Unsubscribe
     }
 }
