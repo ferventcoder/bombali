@@ -36,6 +36,8 @@ namespace bombali.infrastructure.app.processors
                     if (message_contains_approve(message_word)) { query_type = MailQueryType.Authorized; break; }
                     if (message_contains_deny(message_word)) { query_type = MailQueryType.Denied; break; }
                     if (message_contains_version(message_word)) { query_type = MailQueryType.Version; break; }
+                    if (message_contains_subscribe(message_word)) { query_type = MailQueryType.Subscribe; break; }
+                    if (message_contains_unsubscribe(message_word)) { query_type = MailQueryType.Unsubscribe; break; }
                 }
             }
 
@@ -70,6 +72,16 @@ namespace bombali.infrastructure.app.processors
         private static bool message_contains_version(string message)
         {
             return message.to_lower().Contains("version");
+        }
+
+        private static bool message_contains_subscribe(string message)
+        {
+            return message.to_lower().Contains("sub") || message.to_lower().Contains("subscribe");
+        }
+
+        private static bool message_contains_unsubscribe(string message)
+        {
+            return message.to_lower().Contains("unsub") || message.to_lower().Contains("unsubscribe");
         }
     }
 }

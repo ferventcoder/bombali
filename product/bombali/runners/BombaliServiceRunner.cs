@@ -3,6 +3,7 @@ namespace bombali.runners
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Timers;
     using domain;
     using infrastructure;
     using infrastructure.app.processors;
@@ -11,13 +12,14 @@ namespace bombali.runners
     using infrastructure.logging;
     using infrastructure.mapping;
     using infrastructure.notifications;
+    using infrastructure.timers;
     using orm;
     using sidepop.infrastructure.extensions;
     using sidepop.Mail;
     using sidepop.message.events;
     using sidepop.runners;
-    using Email = bombali.domain.Email;
-    using Version = bombali.infrastructure.information.Version;
+    using Email = domain.Email;
+    using Version = infrastructure.information.Version;
 
     public class BombaliServiceRunner : IRunner
     {
@@ -27,6 +29,7 @@ namespace bombali.runners
         private readonly Stopwatch up_time;
         private IList<IMonitor> monitors;
         private IDictionary<string, ApprovalType> authorization_dictionary;
+        private IDictionary<string, string> subscribers;
 
         public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores, IMailParser mail_processor, IRepository repository)
         {
@@ -42,6 +45,7 @@ namespace bombali.runners
             configure_mail_watcher();
             start_monitoring();
             set_up_authorization_dictionary();
+            configure_subscriber_timer();
         }
 
         private void set_up_authorization_dictionary()
@@ -49,7 +53,8 @@ namespace bombali.runners
             Log.bound_to(this).Info("{0} is setting up the authorized users list.", ApplicationParameters.name);
             authorization_dictionary = new Dictionary<string, ApprovalType>();
             authorization_dictionary.Add(BombaliConfiguration.settings.administrator_email.to_lower(), ApprovalType.Approved);
-            Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name, BombaliConfiguration.settings.administrator_email);
+            Log.bound_to(this).Debug("{0} added {1} to the authorized users list.", ApplicationParameters.name,
+                                     BombaliConfiguration.settings.administrator_email);
             foreach (IMonitor monitor in monitors)
             {
                 foreach (string email_address in monitor.who_to_notify_as_comma_separated_list.Split(','))
@@ -89,8 +94,8 @@ namespace bombali.runners
             catch (Exception ex)
             {
                 Log.bound_to(this).Error("{0} service had an error processing messages on {1} (with user {2}):{3}{4}", ApplicationParameters.name,
-                                    Environment.MachineName, Environment.UserName,
-                                    Environment.NewLine, ex.ToString());
+                                         Environment.MachineName, Environment.UserName,
+                                         Environment.NewLine, ex.ToString());
             }
         }
 
@@ -137,7 +142,7 @@ namespace bombali.runners
                 case MailQueryType.Help:
                     response_text =
                         string.Format(
-                            "Options - send one:{0}help - this menu{0}status - up time{0}config - all monitors{0}down - monitors in error{0}version - current version",
+                            "Options- send 1:{0}help{0}status{0}config{0}down - errors{0}version{0}sub{0}unsub",
                             Environment.NewLine);
                     break;
                 case MailQueryType.Status:
@@ -162,28 +167,36 @@ namespace bombali.runners
                 case MailQueryType.Version:
                     response_text = string.Format("Bombali is currently running version {0}.", Version.get_version());
                     break;
+                case MailQueryType.Subscribe:
+                    if (!subscribers.ContainsKey(respond_to.to_lower())) subscribers.Add(respond_to.to_lower(), respond_to);
+                    response_text = string.Format("You are now subscribed to receive daily status messages");
+                    break;
+                case MailQueryType.Unsubscribe:
+                    if (subscribers.ContainsKey(respond_to.to_lower())) subscribers.Remove(respond_to.to_lower());
+                    response_text = string.Format("You are now unsubscribed from daily status messages");
+                    break;
                 default:
                     response_text = string.Format("{0} has not been implemented yet. Please watch for updates.", query_type);
                     break;
             }
 
-            SendNotification
-                .from(BombaliConfiguration.settings.email_from)
-                .to(respond_to)
-                .with_subject("Bombali")
-                .with_message(response_text)
-                .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
+            send_notification(respond_to, response_text);
 
             if (query_type == MailQueryType.Authorizing)
             {
-                SendNotification
-                .from(BombaliConfiguration.settings.email_from)
-                .to(BombaliConfiguration.settings.administrator_email)
-                .with_subject("Bombali")
-                .with_message(string.Format("{0} reqests approval. Send approve/deny w/email address. Ex. 'deny bob@nowhere.com'", respond_to))
-                .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
+                send_notification(BombaliConfiguration.settings.administrator_email,
+                                  string.Format("{0} reqests approval. Send approve/deny w/email address. Ex. 'deny bob@nowhere.com'", respond_to));
             }
+        }
 
+        private void send_notification(string send_to, string message_text)
+        {
+            SendNotification
+                .from(BombaliConfiguration.settings.email_from)
+                .to(send_to)
+                .with_subject("Bombali")
+                .with_message(message_text)
+                .and_use_notification_host(BombaliConfiguration.settings.smtp_host);
         }
 
         private void start_monitoring()
@@ -204,5 +217,44 @@ namespace bombali.runners
                 //).Start();
             }
         }
+
+        #region Subscribers Notice
+
+        private DefaultTimer subscriber_timer;
+        private bool status_message_sent;
+        private const int status_message_hour = 21;
+        private const int subscriber_timer_interval_in_minutes = 15;
+
+        private void configure_subscriber_timer()
+        {
+            subscriber_timer = new DefaultTimer(subscriber_timer_interval_in_minutes);
+            subscriber_timer.Elapsed += subscriber_timer_Elapsed;
+            subscriber_timer.start();
+        }
+
+        private void subscriber_timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            subscriber_timer.stop();
+
+            int current_hour = DateTime.Now.Hour;
+            if (current_hour != status_message_hour) status_message_sent = false;
+
+            if (current_hour == status_message_hour && !status_message_sent)
+            {
+                foreach (KeyValuePair<string, string> subscriber in subscribers)
+                {
+                    TimeSpan up_time_current = up_time.Elapsed;
+                    string message_text = string.Format("{0} has been up and running for {1} days {2} hours {3} minutes and {4} seconds.",
+                                                        ApplicationParameters.name,
+                                                        up_time_current.Days, up_time_current.Hours, up_time_current.Minutes, up_time_current.Seconds);
+                    send_notification(subscriber.Value, message_text);
+                }
+                status_message_sent = true;
+            }
+
+            subscriber_timer.start();
+        }
+
+        #endregion
     }
 }

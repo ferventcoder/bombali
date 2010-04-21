@@ -101,6 +101,7 @@
     <Compile Include="infrastructure\notifications\NotificationBuilderSpecs.cs" />
     <Compile Include="infrastructure\notifications\SendNotificationSpecs.cs" />
     <Compile Include="infrastructure\resolvers\DefaultInstanceCreatorSpecs.cs" />
+    <Compile Include="infrastructure\timers\DateTimeSpecs.cs" />
     <Compile Include="infrastructure\timers\DefaultTimerSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
