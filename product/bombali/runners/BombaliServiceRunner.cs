@@ -29,7 +29,7 @@ namespace bombali.runners
         private readonly Stopwatch up_time;
         private IList<IMonitor> monitors;
         private IDictionary<string, ApprovalType> authorization_dictionary;
-        private IDictionary<string, string> subscribers;
+        private readonly IDictionary<string, string> subscribers = new Dictionary<string, string>();
 
         public BombaliServiceRunner(IEnumerable<IPersistenceStore> persistence_stores, IMailParser mail_processor, IRepository repository)
         {
@@ -189,7 +189,7 @@ namespace bombali.runners
             }
         }
 
-        private void send_notification(string send_to, string message_text)
+        private static void send_notification(string send_to, string message_text)
         {
             SendNotification
                 .from(BombaliConfiguration.settings.email_from)
