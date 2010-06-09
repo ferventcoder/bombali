@@ -1,5 +1,6 @@
 namespace bombali.domain
 {
+    using System;
     using System.Threading;
     using System.Timers;
     using infrastructure;
@@ -82,8 +83,15 @@ namespace bombali.domain
             string subject = string.Format("{0} - \"{1}\" {2}", ApplicationParameters.name, name, reporting_type);
             string message = string.Format("{0} reports {1} for {2}.", ApplicationParameters.name, response, what_to_check);
 
-            SendNotification.from(who_notification_comes_from).to(who_to_notify_as_comma_separated_list).with_subject(
-                subject).with_message(message).and_use_notification_host(notification_host);
+            try
+            {
+                SendNotification.from(who_notification_comes_from).to(who_to_notify_as_comma_separated_list).with_subject(
+                                subject).with_message(message).and_use_notification_host(notification_host);
+            }
+            catch (Exception ex)
+            {
+                Log.bound_to(this).Error("{0} is not able to send email for monitoring error.{1]{2}", ApplicationParameters.name, Environment.NewLine, ex.ToString());
+            }
         }
     }
 }
